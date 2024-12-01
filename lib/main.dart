@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'firebase_options.dart';
 import 'forgetpassword/ChangePassword.dart';
+import 'forgetpassword/ForgotPassword.dart';
 // import 'forgetpassword/ResetPassword.dart';
 // import 'forgetpassword/SendCode.dart';
 // import 'forgetpassword/ForgotPassword.dart';
@@ -27,8 +28,8 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       // home: const LoginPage(), //Set LoginPage as the home page
-      // home: const ForgotPasswordPage(),
-      home: const ChangePasswordPage(),
+      home: const ForgotPasswordPage(),
+      // home: const ChangePasswordPage(),
     );
   }
 }
