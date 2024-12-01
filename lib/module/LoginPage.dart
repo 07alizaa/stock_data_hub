@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+
 import 'SignUpPage.dart';
 
 class LoginPage extends StatefulWidget {
@@ -119,6 +120,17 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                 ),
                               ),
+                              // Forgot Password Button
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: TextButton(
+                                  onPressed: _forgotPassword,
+                                  child: const Text(
+                                    "Forgot Password?",
+                                    style: TextStyle(color: Colors.white70),
+                                  ),
+                                ),
+                              ),
                               const SizedBox(height: 25),
                               Center(
                                 child: ElevatedButton(
@@ -140,7 +152,43 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 20),
+                              const SizedBox(height: 30),
+                              // Social Login Icons
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  // Facebook Icon
+                                  Container(
+                                    width: 50,
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.white,
+                                    ),
+                                    child: IconButton(
+                                      icon: Image.asset('assets/facebook.png'), // Add Facebook icon to assets
+                                      iconSize: 30,
+                                      onPressed: _loginWithFacebook,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 20),
+                                  // Google Icon
+                                  Container(
+                                    width: 50,
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.white,
+                                    ),
+                                    child: IconButton(
+                                      icon: Image.asset('assets/google.png'), // Add Google icon to assets
+                                      iconSize: 30,
+                                      onPressed: _loginWithGoogle,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 30),
                               Center(
                                 child: TextButton(
                                   onPressed: () {
@@ -206,5 +254,23 @@ class _LoginPageState extends State<LoginPage> {
     setState(() {
       isHidePassword = !isHidePassword;
     });
+  }
+
+  void _forgotPassword() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Forgot Password? Feature coming soon...')),
+    );
+  }
+
+  void _loginWithGoogle() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Google login not implemented yet.')),
+    );
+  }
+
+  void _loginWithFacebook() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Facebook login not implemented yet.')),
+    );
   }
 }
