@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'firebase_options.dart';
 import 'forgetpassword/ChangePassword.dart';
 import 'forgetpassword/ForgotPassword.dart';
+import 'module/LoginPage.dart';
 // import 'forgetpassword/ResetPassword.dart';
 // import 'forgetpassword/SendCode.dart';
 // import 'forgetpassword/ForgotPassword.dart';
@@ -27,8 +28,8 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      // home: const LoginPage(), //Set LoginPage as the home page
-      home: const ForgotPasswordPage(),
+      home: const LoginPage(), //Set LoginPage as the home page
+      // home: const ForgotPasswordPage(),
       // home: const ChangePasswordPage(),
     );
   }

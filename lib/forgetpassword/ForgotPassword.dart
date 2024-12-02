@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:math';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'SendCode.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({Key? key}) : super(key: key);
@@ -9,6 +13,54 @@ class ForgotPasswordPage extends StatefulWidget {
 
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   final TextEditingController emailController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  String? verificationCode;
+
+  void _sendVerificationCode() async {
+    String email = emailController.text.trim();
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter your email address.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    try {
+      // Generate a 4-digit verification code
+      verificationCode = (Random().nextInt(9000) + 1000).toString();
+
+      // Store the verification code in Firestore (optional for later verification)
+      await FirebaseFirestore.instance.collection('passwordResetCodes').add({
+        'email': email,
+        'verificationCode': verificationCode,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
+      // Send password reset email via Firebase Authentication
+      await _auth.sendPasswordResetEmail(email: email).then((value) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('A password reset link and verification code have been sent to your email: $verificationCode.'),
+            duration: Duration(seconds: 4),
+          ),
+        );
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => SendCodePage(email: email, verificationCode: verificationCode!)),
+        );
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
+          duration: Duration(seconds: 4),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +118,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                               ),
                               const SizedBox(height: 8),
                               const Text(
-                                "Please enter your email address to receive a verification code.",
+                                "Please enter your email address to receive a password reset link and a 4-digit verification code.",
                                 style: TextStyle(color: Colors.white70, fontSize: 16),
                               ),
                               const SizedBox(height: 25),
@@ -87,11 +139,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                     borderSide: const BorderSide(color: Color(0xFFFFA726), width: 2.0),
                                   ),
                                 ),
+                                keyboardType: TextInputType.emailAddress,
                               ),
                               const SizedBox(height: 25),
                               Center(
                                 child: ElevatedButton(
-                                  onPressed: () {},
+                                  onPressed: _sendVerificationCode,
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFFFFA726),
                                     padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 60.0),
