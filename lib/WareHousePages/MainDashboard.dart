@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'WInventoryManagement.dart';
+
 
 class Maindashboard extends StatefulWidget {
   const Maindashboard({Key? key}) : super(key: key);
@@ -79,6 +81,14 @@ class _MaindashboardState extends State<Maindashboard> {
           setState(() {
             _selectedIndex = index;
           });
+
+          if (index == 1) {
+            // Navigate to the InventoryManagementScreen when the "Inventory" tab is tapped
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => InventoryManagementScreen()),
+            );
+          }
         },
         type: BottomNavigationBarType.fixed,
         items: const [
