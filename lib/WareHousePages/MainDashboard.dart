@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'WInventoryManagement.dart';
+import 'AlertsNotificationScreen.dart'; // Import the AlertsNotifications scre;en
 
 
 class Maindashboard extends StatefulWidget {
@@ -89,15 +90,23 @@ class _MaindashboardState extends State<Maindashboard> {
               MaterialPageRoute(builder: (context) => InventoryManagementScreen()),
             );
           }
+          else if (index == 3) {
+            // Navigate to the AlertsNotifications screen when the "Alerts" tab is tapped
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AlertsNotifications()), // Add this
+            );
+          }
         },
         type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.inventory), label: 'Inventory'),
           BottomNavigationBarItem(icon: Icon(Icons.task), label: 'Tasks'),
-          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Alerts'),
+          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Alerts'), // Alerts tab
         ],
       ),
+
     );
   }
 
