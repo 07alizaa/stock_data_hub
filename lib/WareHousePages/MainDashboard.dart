@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'WInventoryManagement.dart';
 import 'AlertsNotificationScreen.dart'; // Import the AlertsNotifications scre;en
+import 'TaskManagementScreen.dart';
+
 
 
 class Maindashboard extends StatefulWidget {
@@ -83,18 +85,25 @@ class _MaindashboardState extends State<Maindashboard> {
             _selectedIndex = index;
           });
 
+          // Using if-else to navigate to the appropriate screen
           if (index == 1) {
             // Navigate to the InventoryManagementScreen when the "Inventory" tab is tapped
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => InventoryManagementScreen()),
             );
-          }
-          else if (index == 3) {
+          } else if (index == 2) {
+            // Navigate to the TaskManagement screen when the "Tasks" tab is tapped
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const TasksManagement()),
+              // Corrected class name
+            );
+          } else if (index == 3) {
             // Navigate to the AlertsNotifications screen when the "Alerts" tab is tapped
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => AlertsNotifications()), // Add this
+              MaterialPageRoute(builder: (context) => AlertsNotifications()), // Alerts Notifications screen
             );
           }
         },
@@ -106,7 +115,6 @@ class _MaindashboardState extends State<Maindashboard> {
           BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Alerts'), // Alerts tab
         ],
       ),
-
     );
   }
 
