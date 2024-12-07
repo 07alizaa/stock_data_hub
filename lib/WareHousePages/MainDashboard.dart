@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'WInventoryManagement.dart';
-import 'AlertsNotificationScreen.dart'; // Import the AlertsNotifications scre;en
+import 'AlertsNotificationScreen.dart';
 import 'TaskManagementScreen.dart';
+import 'DemandForecastScreen.dart';
+
 
 
 
@@ -85,25 +87,28 @@ class _MaindashboardState extends State<Maindashboard> {
             _selectedIndex = index;
           });
 
-          // Using if-else to navigate to the appropriate screen
-          if (index == 1) {
-            // Navigate to the InventoryManagementScreen when the "Inventory" tab is tapped
+          // Handle navigation based on the selected index
+          if (index == 0) {
+            // Navigate to the home screen (default behavior)
+          } else if (index == 1) {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => InventoryManagementScreen()),
             );
           } else if (index == 2) {
-            // Navigate to the TaskManagement screen when the "Tasks" tab is tapped
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const TasksManagement()),
-              // Corrected class name
             );
           } else if (index == 3) {
-            // Navigate to the AlertsNotifications screen when the "Alerts" tab is tapped
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => AlertsNotifications()), // Alerts Notifications screen
+              MaterialPageRoute(builder: (context) => AlertsNotifications()),
+            );
+          } else if (index == 4) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const DemandForecastScreen()),
             );
           }
         },
@@ -112,9 +117,11 @@ class _MaindashboardState extends State<Maindashboard> {
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.inventory), label: 'Inventory'),
           BottomNavigationBarItem(icon: Icon(Icons.task), label: 'Tasks'),
-          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Alerts'), // Alerts tab
+          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Alerts'),
+          BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Forecast'), // Add Forecast Tab
         ],
       ),
+
     );
   }
 
@@ -202,36 +209,45 @@ class _MaindashboardState extends State<Maindashboard> {
 
 
   Widget _buildDemandForecastSection() {
-    return Card(
-      elevation: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Demand Forecast',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Container(
-              height: 200,
-              color: Colors.grey[200],
-              child: const Center(
-                child: Text(
-                  'Placeholder for Demand Forecast Graph',
-                  style: TextStyle(color: Colors.grey),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const DemandForecastScreen()),
+        );
+      },
+      child: Card(
+        elevation: 4,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Demand Forecast',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 10),
+              Container(
+                height: 200,
+                color: Colors.grey[200],
+                child: const Center(
+                  child: Text(
+                    'Placeholder for Demand Forecast Graph',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
+
 
   Widget _buildInventoryTable() {
     return Card(
