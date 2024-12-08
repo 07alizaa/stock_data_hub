@@ -1,14 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'dashboard/suppliers.dart';
 import 'firebase_options.dart';
-import 'forgetpassword/ChangePassword.dart';
-import 'forgetpassword/ForgotPassword.dart';
+import 'module/HomePage.dart';
 import 'module/LoginPage.dart';
-// import 'forgetpassword/ResetPassword.dart';
-// import 'forgetpassword/SendCode.dart';
-// import 'forgetpassword/ForgotPassword.dart';
-// import 'module/LoginPage.dart';
-
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,7 +23,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const LoginPage(), //Set LoginPage as the home page
+      home: const HomePage(), //Set LoginPage as the home page
       // home: const ForgotPasswordPage(),
       // home: const ChangePasswordPage(),
     );
