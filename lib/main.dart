@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:stock_data_hub/ProductManagement/AddNewProduct.dart';
 import 'firebase_options.dart';
 import 'forgetpassword/ChangePassword.dart';
 import 'forgetpassword/ForgotPassword.dart';
@@ -29,7 +30,8 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const Maindashboard (), //Set LoginPage as the home page
+      home: const AddNewProduct (),
+      //Set LoginPage as the home page
       // home: const ForgotPasswordPage(),
       // home: const ChangePasswordPage(),
     );
