@@ -33,6 +33,16 @@ class _InventoryManagementScreenState extends State<InventoryManagementScreen> {
               _showFilterDialog();
             },
           ),
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () {
+              // Navigate to the Add Product screen
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AddProductScreen()),
+              );
+            },
+          ),
         ],
       ),
       body: Padding(
@@ -78,12 +88,11 @@ class _InventoryManagementScreenState extends State<InventoryManagementScreen> {
       return _inventory;
     }
     return _inventory
-        .where((item) =>
-        item['name'].toLowerCase().contains(_searchQuery.toLowerCase()))
+        .where((item) => item['name'].toLowerCase().contains(_searchQuery.toLowerCase()))
         .toList();
   }
 
-// Build individual inventory card
+  // Build individual inventory card
   Widget _buildInventoryCard(Map<String, dynamic> item) {
     Color statusColor;
     switch (item['status']) {
@@ -144,12 +153,40 @@ class _InventoryManagementScreenState extends State<InventoryManagementScreen> {
                 ),
               ),
             ),
+            // Action Buttons
+            Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.edit, color: Colors.white),
+                  onPressed: () {
+                    // Navigate to the Edit Product screen
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => EditProductScreen(item: item)),
+                    );
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.white),
+                  onPressed: () {
+                    // Handle delete action
+                    _deleteProduct(item);
+                  },
+                ),
+              ],
+            ),
           ],
         ),
       ),
     );
   }
 
+  // Delete a product
+  void _deleteProduct(Map<String, dynamic> item) {
+    setState(() {
+      _inventory.remove(item);
+    });
+  }
 
   // Show filter dialog (placeholder)
   void _showFilterDialog() {
@@ -167,6 +204,42 @@ class _InventoryManagementScreenState extends State<InventoryManagementScreen> {
           ],
         );
       },
+    );
+  }
+}
+
+// Add Product Screen
+class AddProductScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Add Product'),
+        backgroundColor: const Color(0xFF123D59),
+      ),
+      body: Center(
+        child: Text('Add Product Form Here'),
+      ),
+    );
+  }
+}
+
+// Edit Product Screen
+class EditProductScreen extends StatelessWidget {
+  final Map<String, dynamic> item;
+
+  const EditProductScreen({required this.item, Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Edit Product'),
+        backgroundColor: const Color(0xFF123D59),
+      ),
+      body: Center(
+        child: Text('Edit Product Form for ${item['name']}'),
+      ),
     );
   }
 }

@@ -8,6 +8,7 @@ import 'module/LoginPage.dart';
 // import 'forgetpassword/SendCode.dart';
 // import 'forgetpassword/ForgotPassword.dart';
 // import 'module/LoginPage.dart';
+import 'WareHousePages/MainDashboard.dart';
 
 
 Future<void> main() async {
@@ -28,7 +29,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const LoginPage(), //Set LoginPage as the home page
+      home: const Maindashboard (), //Set LoginPage as the home page
       // home: const ForgotPasswordPage(),
       // home: const ChangePasswordPage(),
     );
