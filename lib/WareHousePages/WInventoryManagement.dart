@@ -25,35 +25,9 @@ class _InventoryManagementScreenState extends State<InventoryManagementScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8EFE3),
       body: SafeArea(
-        child: Column(
-          children: [
-            _buildHeader(),
-            Expanded(child: _buildInventoryList()),
-          ],
-        ),
+        child: _buildInventoryList(),
       ),
       floatingActionButton: _buildAddProductButton(),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      child: Column(
-        children: [
-          Image.asset('assets/logo.png', height: 80),
-          const SizedBox(height: 10),
-          const Text(
-            "STOCK DATA HUB",
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFFB66A39),
-              letterSpacing: 1.5,
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -64,6 +38,15 @@ class _InventoryManagementScreenState extends State<InventoryManagementScreen> {
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
+          const Text(
+            'Manage Your Inventory',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF123D59),
+            ),
+          ),
+          const SizedBox(height: 10), // Add spacing between heading and search bar
           _buildSearchBar(),
           const SizedBox(height: 20),
           Expanded(
@@ -82,16 +65,18 @@ class _InventoryManagementScreenState extends State<InventoryManagementScreen> {
   Widget _buildSearchBar() {
     return TextField(
       decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.search, color: Color(0xFF173A5E)),
+        prefixIcon: const Icon(Icons.search, color: Colors.white),
         hintText: 'Search inventory...',
+        hintStyle: const TextStyle(color: Colors.white70),
         filled: true,
-        fillColor: const Color(0xFFF8EFE3),
+        fillColor: const Color(0xFF173A5E), // Teal blue color for the background
         contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide.none,
         ),
       ),
+      style: const TextStyle(color: Colors.white),
       onChanged: (value) => setState(() => _searchQuery = value),
     );
   }
@@ -239,8 +224,6 @@ class _InventoryManagementScreenState extends State<InventoryManagementScreen> {
       ),
     );
   }
-
-
 
   void _showUpdatePage(Map<String, dynamic> item, int index) {
     Navigator.of(context).push(
