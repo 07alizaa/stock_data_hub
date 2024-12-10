@@ -16,7 +16,7 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController addressController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   String? selectedRole;
-  final List<String> roles = ['Customer', 'Seller', 'Admin'];
+  final List<String> roles = ['WareHouse', 'Suppliers', 'Admin'];
   bool isHidePassword = true;
   bool _isEmailValid = true;
   bool _isPasswordValid = true;

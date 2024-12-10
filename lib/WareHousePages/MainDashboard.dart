@@ -4,12 +4,7 @@ import 'AlertsNotificationScreen.dart';
 import 'TaskManagementScreen.dart';
 import 'DemandForecastScreen.dart';
 
-
-
-
 class Maindashboard extends StatefulWidget {
-  const Maindashboard({Key? key}) : super(key: key);
-
   @override
   _MaindashboardState createState() => _MaindashboardState();
 }
@@ -20,15 +15,23 @@ class _MaindashboardState extends State<Maindashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF123D59), // Set background color here
       appBar: AppBar(
-        title: const Text('Warehouse Manager Dashboard'),
+        backgroundColor: const Color(0xFF123D59), // Matching background color for AppBar
+        elevation: 0,
+        title: const Text(
+          'Warehouse Manager Dashboard',
+          style: TextStyle(
+            color: Colors.white, // Title text in white color
+          ),
+        ),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
             child: Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: Colors.grey[300],
+                  backgroundColor: const Color(0xFF123D59),
                   backgroundImage: const NetworkImage(
                     'https://via.placeholder.com/150', // Placeholder profile image
                   ),
@@ -40,10 +43,11 @@ class _MaindashboardState extends State<Maindashboard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Welcome, Warehouse Manager',
+                      'Hello, Warehouse Manager!', // Updated text
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
+                        color: Colors.white, // Text in white color
                       ),
                     ),
                   ],
@@ -59,22 +63,12 @@ class _MaindashboardState extends State<Maindashboard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Quick Stats Section
               _buildQuickStatsSection(),
-
               const SizedBox(height: 20),
-
-              // Demand Forecast Section
               _buildDemandForecastSection(),
-
               const SizedBox(height: 20),
-
-              // Real-Time Inventory Table
               _buildInventoryTable(),
-
               const SizedBox(height: 20),
-
-              // Alerts Section
               _buildAlertsSection(),
             ],
           ),
@@ -118,10 +112,9 @@ class _MaindashboardState extends State<Maindashboard> {
           BottomNavigationBarItem(icon: Icon(Icons.inventory), label: 'Inventory'),
           BottomNavigationBarItem(icon: Icon(Icons.task), label: 'Tasks'),
           BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Alerts'),
-          BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Forecast'), // Add Forecast Tab
+          BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Forecast'),
         ],
       ),
-
     );
   }
 
@@ -188,7 +181,7 @@ class _MaindashboardState extends State<Maindashboard> {
                       fontWeight: FontWeight.bold,
                       color: color,
                     ),
-                    overflow: TextOverflow.ellipsis, // Avoid overflow
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
@@ -206,7 +199,6 @@ class _MaindashboardState extends State<Maindashboard> {
       ),
     );
   }
-
 
   Widget _buildDemandForecastSection() {
     return GestureDetector(
@@ -247,7 +239,6 @@ class _MaindashboardState extends State<Maindashboard> {
       ),
     );
   }
-
 
   Widget _buildInventoryTable() {
     return Card(

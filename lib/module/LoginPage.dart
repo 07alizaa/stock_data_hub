@@ -1,9 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import '../WareHousePages/MainDashboard.dart';
 import '../forgetpassword/ForgotPassword.dart';
 
 import 'SignUpPage.dart';
+// import 'MainDashboard.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -34,23 +36,13 @@ class _LoginPageState extends State<LoginPage> {
                 child: IntrinsicHeight(
                   child: Column(
                     children: [
-                      SizedBox(height: MediaQuery
-                          .of(context)
-                          .size
-                          .height * 0.05),
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.05),
                       CircleAvatar(
-                        radius: MediaQuery
-                            .of(context)
-                            .size
-                            .width * 0.15,
+                        radius: MediaQuery.of(context).size.width * 0.15,
                         backgroundColor: Colors.white,
                         child: Padding(
-                          padding: EdgeInsets.all(MediaQuery
-                              .of(context)
-                              .size
-                              .width * 0.05),
-                          child: Image.asset(
-                              'assets/logo.png', fit: BoxFit.contain),
+                          padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
+                          child: Image.asset('assets/logo.png', fit: BoxFit.contain),
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -63,19 +55,14 @@ class _LoginPageState extends State<LoginPage> {
                           letterSpacing: 1.5,
                         ),
                       ),
-                      SizedBox(height: MediaQuery
-                          .of(context)
-                          .size
-                          .height * 0.04),
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.04),
                       Expanded(
                         child: Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 24.0, vertical: 30.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 30.0),
                           decoration: const BoxDecoration(
                             color: Color(0xFF123D59),
-                            borderRadius: BorderRadius.vertical(
-                                top: Radius.circular(40)),
+                            borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -91,32 +78,27 @@ class _LoginPageState extends State<LoginPage> {
                               const SizedBox(height: 8),
                               const Text(
                                 "Login to continue using the app",
-                                style: TextStyle(
-                                    color: Colors.white70, fontSize: 16),
+                                style: TextStyle(color: Colors.white70, fontSize: 16),
                               ),
                               const SizedBox(height: 25),
-                              // Email Text Field
                               TextField(
                                 controller: emailController,
                                 decoration: InputDecoration(
                                   hintText: "Enter your email",
                                   filled: true,
                                   fillColor: Colors.white,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 16, horizontal: 12),
+                                  contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(15),
                                     borderSide: BorderSide.none,
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(15),
-                                    borderSide: const BorderSide(
-                                        color: Color(0xFFFFA726), width: 2.0),
+                                    borderSide: const BorderSide(color: Color(0xFFFFA726), width: 2.0),
                                   ),
                                 ),
                               ),
                               const SizedBox(height: 20),
-                              // Password Text Field
                               TextField(
                                 controller: passwordController,
                                 obscureText: isHidePassword,
@@ -124,26 +106,21 @@ class _LoginPageState extends State<LoginPage> {
                                   hintText: "Enter password",
                                   filled: true,
                                   fillColor: Colors.white,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 16, horizontal: 12),
+                                  contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(15),
                                     borderSide: BorderSide.none,
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(15),
-                                    borderSide: const BorderSide(
-                                        color: Color(0xFFFFA726), width: 2.0),
+                                    borderSide: const BorderSide(color: Color(0xFFFFA726), width: 2.0),
                                   ),
                                   suffixIcon: InkWell(
                                     onTap: _togglePasswordView,
-                                    child: Icon(isHidePassword
-                                        ? Icons.visibility_off
-                                        : Icons.visibility),
+                                    child: Icon(isHidePassword ? Icons.visibility_off : Icons.visibility),
                                   ),
                                 ),
                               ),
-                              // Forgot Password Button
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: TextButton(
@@ -151,8 +128,7 @@ class _LoginPageState extends State<LoginPage> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (
-                                            context) => const ForgotPasswordPage(),
+                                        builder: (context) => const ForgotPasswordPage(),
                                       ),
                                     );
                                   },
@@ -168,8 +144,7 @@ class _LoginPageState extends State<LoginPage> {
                                   onPressed: _login,
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFFFFA726),
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 16.0, horizontal: 60.0),
+                                    padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 60.0),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(30),
                                     ),
@@ -185,11 +160,9 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               ),
                               const SizedBox(height: 30),
-                              // Social Login Icons
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  // Facebook Icon
                                   Container(
                                     width: 50,
                                     height: 50,
@@ -199,13 +172,11 @@ class _LoginPageState extends State<LoginPage> {
                                     ),
                                     child: IconButton(
                                       icon: Image.asset('assets/facebook.png'),
-                                      // Add Facebook icon to assets
                                       iconSize: 30,
                                       onPressed: _loginWithFacebook,
                                     ),
                                   ),
                                   const SizedBox(width: 20),
-                                  // Google Icon
                                   Container(
                                     width: 50,
                                     height: 50,
@@ -215,7 +186,6 @@ class _LoginPageState extends State<LoginPage> {
                                     ),
                                     child: IconButton(
                                       icon: Image.asset('assets/google.png'),
-                                      // Add Google icon to assets
                                       iconSize: 30,
                                       onPressed: _loginWithGoogle,
                                     ),
@@ -229,15 +199,13 @@ class _LoginPageState extends State<LoginPage> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (
-                                            context) => const SignUpPage(),
+                                        builder: (context) => const SignUpPage(),
                                       ),
                                     );
                                   },
                                   child: const Text(
                                     "Don't have an account? Sign up",
-                                    style: TextStyle(
-                                        color: Colors.white70, fontSize: 16),
+                                    style: TextStyle(color: Colors.white70, fontSize: 16),
                                   ),
                                 ),
                               ),
@@ -263,23 +231,11 @@ class _LoginPageState extends State<LoginPage> {
         password: passwordController.text.trim(),
       );
 
-      // Retrieve user data from Firestore
-      DocumentSnapshot userDoc = await _firestore.collection('users').doc(
-          userCredential.user?.uid).get();
-
-      if (userDoc.exists) {
-        Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(
-                  'Welcome back, ${userData['full_name']}! Your phone number is ${userData['phone']} and role is ${userData['role']}.')),
-        );
-        Navigator.of(context).pop();
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('User data not found')),
-        );
-      }
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => Maindashboard()),
+            (route) => false,
+      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
@@ -301,7 +257,7 @@ class _LoginPageState extends State<LoginPage> {
 
   void _loginWithFacebook() {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('facebook login not implemented yet.')),
+      const SnackBar(content: Text('Facebook login not implemented yet.')),
     );
   }
 }
