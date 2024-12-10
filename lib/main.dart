@@ -1,13 +1,13 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'admindashboard/Dashboard.dart';
+import 'package:stock_data_hub/WareHousePages/MainDashboard.dart';
 import 'firebase_options.dart';
-// import 'maindashboard/AddProduct.dart';
-import 'maindashboard/DashboardPage.dart';
-import 'maindashboard/InventoryManagement.dart';
-import 'maindashboard/Reports.dart';
-import 'module/HomePage.dart';
+import 'forgetpassword/ChangePassword.dart';
+import 'forgetpassword/ForgotPassword.dart';
 import 'module/LoginPage.dart';
+
+import 'WareHousePages/WInventoryManagement.dart';
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,9 +27,8 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: HomePage(), //Set LoginPage as the home page
-      // home: const ForgotPasswordPage(),
-      // home: const ChangePasswordPage(),
+      home:  Maindashboard (),
+
     );
   }
 }

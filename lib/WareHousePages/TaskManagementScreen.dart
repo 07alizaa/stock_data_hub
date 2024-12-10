@@ -25,8 +25,9 @@ class _TasksManagementState extends State<TasksManagement> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF8EFE3), // Beige background
       appBar: AppBar(
-        backgroundColor: const Color(0xFF123D59),
+        backgroundColor: const Color(0xFF123D59), // Blue-teal AppBar
         title: const Text("Tasks Management"),
       ),
       body: Padding(
@@ -40,7 +41,7 @@ class _TasksManagementState extends State<TasksManagement> {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF123D59),
+                color: Color(0xFF123D59), // Blue-teal text
               ),
             ),
             const SizedBox(height: 16),
@@ -51,49 +52,64 @@ class _TasksManagementState extends State<TasksManagement> {
                 itemCount: tasks.length,
                 itemBuilder: (context, index) {
                   return Card(
-                    elevation: 3,
                     margin: const EdgeInsets.symmetric(vertical: 8),
-                    child: ListTile(
-                      leading: Icon(
-                        tasks[index]["status"] == "Completed"
-                            ? Icons.check_circle
-                            : Icons.pending_actions,
-                        color: tasks[index]["status"] == "Completed"
-                            ? Colors.green
-                            : Colors.orange,
-                      ),
-                      title: Text(
-                        tasks[index]["title"],
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      subtitle: Text(
-                        tasks[index]["status"],
-                        style: TextStyle(
-                          color: tasks[index]["status"] == "Completed"
-                              ? Colors.green
-                              : tasks[index]["status"] == "In Progress"
-                              ? Colors.blue
-                              : Colors.red,
-                        ),
-                      ),
-                      trailing: tasks[index]["status"] != "Completed"
-                          ? ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF123D59),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    color: const Color(0xFF123D59), // Blue-teal background
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            tasks[index]["title"],
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white, // White text
+                            ),
                           ),
-                        ),
-                        onPressed: () => _markAsCompleted(index),
-                        child: const Text(
-                          "Mark Completed",
-                          style: TextStyle(fontSize: 12),
-                        ),
-                      )
-                          : null,
+                          const SizedBox(height: 8),
+                          Text(
+                            tasks[index]["status"],
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: tasks[index]["status"] == "Completed"
+                                  ? Colors.green
+                                  : tasks[index]["status"] == "In Progress"
+                                  ? Colors.blue
+                                  : Colors.red,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          if (tasks[index]["status"] != "Completed")
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.yellow, // Yellow button
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 8,
+                                    horizontal: 16,
+                                  ),
+                                ),
+                                onPressed: () => _markAsCompleted(index),
+                                child: const Text(
+                                  "Mark Completed",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.black, // Black text for contrast
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
                   );
                 },
@@ -103,7 +119,7 @@ class _TasksManagementState extends State<TasksManagement> {
             // Add New Task Button
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF123D59),
+                backgroundColor: const Color(0xFFECA25B), // Warm orange color
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -112,10 +128,13 @@ class _TasksManagementState extends State<TasksManagement> {
               onPressed: _addNewTaskDialog,
               child: const Text(
                 "Add New Task",
-                style: TextStyle(fontSize: 16, color: Colors.white),
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.white, // White text for good contrast
+                ),
               ),
             ),
-          ],
+          ], // Make sure this matches the start of `children`
         ),
       ),
     );
@@ -149,7 +168,7 @@ class _TasksManagementState extends State<TasksManagement> {
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF123D59),
+                backgroundColor: const Color(0xFF123D59), // Blue-teal button
               ),
               onPressed: () {
                 setState(() {

@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:stock_data_hub/ProductManagement/UpdateProduct.dart';
+import 'package:stock_data_hub/ProductManagement/AddNewProduct.dart'; // Import your UpdateProduct widget
 
 class InventoryManagementScreen extends StatefulWidget {
   const InventoryManagementScreen({Key? key}) : super(key: key);
 
   @override
-  _InventoryManagementScreenState createState() =>
+  State<InventoryManagementScreen> createState() =>
       _InventoryManagementScreenState();
 }
 
 class _InventoryManagementScreenState extends State<InventoryManagementScreen> {
-  // Sample inventory data
   final List<Map<String, dynamic>> _inventory = [
-    {'name': 'Widget A', 'stock': 250, 'reorderLevel': 100, 'status': 'Optimal'},
-    {'name': 'Widget B', 'stock': 75, 'reorderLevel': 200, 'status': 'Low'},
-    {'name': 'Widget C', 'stock': 500, 'reorderLevel': 300, 'status': 'Optimal'},
-    {'name': 'Widget D', 'stock': 150, 'reorderLevel': 250, 'status': 'Warning'},
+    {'name': 'Widget A', 'quantity': 250, 'price': 10.0, 'status': 'Optimal'},
+    {'name': 'Widget B', 'quantity': 75, 'price': 15.5, 'status': 'Low'},
+    {'name': 'Widget C', 'quantity': 500, 'price': 7.25, 'status': 'Optimal'},
+    {'name': 'Widget D', 'quantity': 150, 'price': 12.75, 'status': 'Warning'},
   ];
 
   String _searchQuery = '';
@@ -22,69 +23,65 @@ class _InventoryManagementScreenState extends State<InventoryManagementScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Inventory Management'),
-        backgroundColor: const Color(0xFF123D59), // Dark teal color
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.filter_list),
-            onPressed: () {
-              // Handle filter action
-              _showFilterDialog();
-            },
-          ),
-        ],
+      backgroundColor: const Color(0xFFF8EFE3),
+      body: SafeArea(
+        child: _buildInventoryList(),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // Search Bar
-            TextField(
-              decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.search),
-                hintText: 'Search inventory...',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  _searchQuery = value;
-                });
+      floatingActionButton: _buildAddProductButton(),
+    );
+  }
+
+  Widget _buildInventoryList() {
+    final filteredInventory = _getFilteredInventory();
+
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        children: [
+          const Text(
+            'Manage Your Inventory',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF123D59),
+            ),
+          ),
+          const SizedBox(height: 10), // Add spacing between heading and search bar
+          _buildSearchBar(),
+          const SizedBox(height: 20),
+          Expanded(
+            child: ListView.builder(
+              itemCount: filteredInventory.length,
+              itemBuilder: (context, index) {
+                return _buildInventoryCard(filteredInventory[index], index);
               },
             ),
-            const SizedBox(height: 16),
-
-            // Inventory List
-            Expanded(
-              child: ListView.builder(
-                itemCount: _filteredInventory().length,
-                itemBuilder: (context, index) {
-                  final item = _filteredInventory()[index];
-                  return _buildInventoryCard(item);
-                },
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  // Filter inventory based on search query
-  List<Map<String, dynamic>> _filteredInventory() {
-    if (_searchQuery.isEmpty) {
-      return _inventory;
-    }
-    return _inventory
-        .where((item) =>
-        item['name'].toLowerCase().contains(_searchQuery.toLowerCase()))
-        .toList();
+  Widget _buildSearchBar() {
+    return TextField(
+      decoration: InputDecoration(
+        prefixIcon: const Icon(Icons.search, color: Colors.white),
+        hintText: 'Search inventory...',
+        hintStyle: const TextStyle(color: Colors.white70),
+        filled: true,
+        fillColor: const Color(0xFF173A5E), // Teal blue color for the background
+        contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide.none,
+        ),
+      ),
+      style: const TextStyle(color: Colors.white),
+      onChanged: (value) => setState(() => _searchQuery = value),
+    );
   }
 
-// Build individual inventory card
-  Widget _buildInventoryCard(Map<String, dynamic> item) {
+  Widget _buildInventoryCard(Map<String, dynamic> item, int index) {
     Color statusColor;
     switch (item['status']) {
       case 'Low':
@@ -98,51 +95,94 @@ class _InventoryManagementScreenState extends State<InventoryManagementScreen> {
     }
 
     return Card(
-      elevation: 4,
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
-      color: const Color(0xFF123D59), // Blue color for the card
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      color: const Color(0xFF123D59),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        padding: const EdgeInsets.all(15),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Item Details
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  item['name'],
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white, // White color for text
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item['name'] ?? 'Unknown Item',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text(
+                      'Quantity: ${item['quantity'] ?? 'N/A'}',
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    Text(
+                      'Price: \$${item['price']?.toStringAsFixed(2) ?? '0.00'}',
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: statusColor.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Stock: ${item['stock']}',
-                  style: const TextStyle(color: Colors.white),
-                ),
-                Text(
-                  'Reorder Level: ${item['reorderLevel']}',
-                  style: const TextStyle(color: Colors.white),
+                  child: Text(
+                    item['status'] ?? 'Unknown',
+                    style: TextStyle(
+                      color: statusColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ],
             ),
-            // Status Indicator
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: statusColor.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                item['status'],
-                style: TextStyle(
-                  color: statusColor,
-                  fontWeight: FontWeight.bold,
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton.icon(
+                  onPressed: () => _showUpdatePage(item, index),
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  icon: const Icon(Icons.edit, color: Color(0xFF123D59)),
+                  label: const Text(
+                    'Update',
+                    style: TextStyle(
+                      color: Color(0xFF123D59),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
-              ),
+                const SizedBox(width: 10),
+                TextButton.icon(
+                  onPressed: () => _confirmDelete(index),
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  icon: const Icon(Icons.delete, color: Colors.white),
+                  label: const Text(
+                    'Delete',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -150,23 +190,80 @@ class _InventoryManagementScreenState extends State<InventoryManagementScreen> {
     );
   }
 
+  List<Map<String, dynamic>> _getFilteredInventory() {
+    if (_searchQuery.isEmpty) return _inventory;
+    return _inventory
+        .where((item) =>
+        item['name'].toLowerCase().contains(_searchQuery.toLowerCase()))
+        .toList();
+  }
 
-  // Show filter dialog (placeholder)
-  void _showFilterDialog() {
+  Widget _buildAddProductButton() {
+    return FloatingActionButton.extended(
+      onPressed: () async {
+        final newProduct = await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => AddNewProduct(),
+          ),
+        );
+
+        if (newProduct != null) {
+          setState(() {
+            _inventory.add(newProduct);
+          });
+        }
+      },
+      backgroundColor: const Color(0xFFB66A39),
+      icon: const Icon(Icons.add, color: Colors.white),
+      label: const Text(
+        'Add New Product',
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  void _showUpdatePage(Map<String, dynamic> item, int index) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => Updateproduct(
+          product: item,
+          onUpdate: (updatedProduct) {
+            setState(() {
+              _inventory[index] = updatedProduct;
+            });
+          },
+        ),
+      ),
+    );
+  }
+
+  void _confirmDelete(int index) {
     showDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Filter Inventory'),
-          content: const Text('Filter options will go here.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Close'),
-            ),
-          ],
-        );
-      },
+      builder: (context) => AlertDialog(
+        title: const Text('Confirm Delete'),
+        content: const Text('Are you sure you want to delete this item?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog
+            },
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                _inventory.removeAt(index); // Remove the item from the inventory
+              });
+              Navigator.of(context).pop(); // Close the dialog after deletion
+            },
+            child: const Text('Confirm'),
+          ),
+        ],
+      ),
     );
   }
 }

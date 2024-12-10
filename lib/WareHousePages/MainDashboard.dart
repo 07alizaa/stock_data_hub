@@ -15,7 +15,7 @@ class _MaindashboardState extends State<Maindashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF123D59), // Set background color here
+      backgroundColor: const Color(0xFF123D59), // Set background color
       appBar: AppBar(
         backgroundColor: const Color(0xFF123D59), // Matching background color for AppBar
         elevation: 0,
@@ -43,7 +43,7 @@ class _MaindashboardState extends State<Maindashboard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Hello, Warehouse Manager!', // Updated text
+                      'Hello, Warehouse Manager!',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -75,6 +75,7 @@ class _MaindashboardState extends State<Maindashboard> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: const Color(0xFF123D59), // Blue-teal BottomNavigationBar
         currentIndex: _selectedIndex,
         onTap: (index) {
           setState(() {
@@ -83,7 +84,7 @@ class _MaindashboardState extends State<Maindashboard> {
 
           // Handle navigation based on the selected index
           if (index == 0) {
-            // Navigate to the home screen (default behavior)
+            // Stay on the home screen
           } else if (index == 1) {
             Navigator.push(
               context,
@@ -118,6 +119,7 @@ class _MaindashboardState extends State<Maindashboard> {
     );
   }
 
+  // Quick Stats Section
   Widget _buildQuickStatsSection() {
     return Row(
       children: [
@@ -156,6 +158,7 @@ class _MaindashboardState extends State<Maindashboard> {
     required Color color,
   }) {
     return Card(
+      color: const Color(0xFF123D59), // Blue-teal background for stats
       elevation: 4,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -165,23 +168,17 @@ class _MaindashboardState extends State<Maindashboard> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Flexible(
-                  child: Icon(
-                    icon,
-                    color: color,
-                    size: 30,
-                  ),
+                Icon(
+                  icon,
+                  color: color,
+                  size: 30,
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    value,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: color,
-                    ),
-                    overflow: TextOverflow.ellipsis,
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: color,
                   ),
                 ),
               ],
@@ -191,7 +188,7 @@ class _MaindashboardState extends State<Maindashboard> {
               title,
               style: const TextStyle(
                 fontSize: 14,
-                color: Colors.grey,
+                color: Colors.white,
               ),
             ),
           ],
@@ -209,6 +206,7 @@ class _MaindashboardState extends State<Maindashboard> {
         );
       },
       child: Card(
+        color: const Color(0xFF123D59), // Blue-teal background for forecast
         elevation: 4,
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -220,6 +218,7 @@ class _MaindashboardState extends State<Maindashboard> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  color: Colors.white, // White text
                 ),
               ),
               const SizedBox(height: 10),
@@ -242,6 +241,7 @@ class _MaindashboardState extends State<Maindashboard> {
 
   Widget _buildInventoryTable() {
     return Card(
+      color: const Color(0xFF123D59), // Blue-teal background for inventory
       elevation: 4,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -253,6 +253,7 @@ class _MaindashboardState extends State<Maindashboard> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
+                color: Colors.white, // White text
               ),
             ),
             const SizedBox(height: 10),
@@ -260,10 +261,10 @@ class _MaindashboardState extends State<Maindashboard> {
               scrollDirection: Axis.horizontal,
               child: DataTable(
                 columns: const [
-                  DataColumn(label: Text('Item Name')),
-                  DataColumn(label: Text('Current Stock')),
-                  DataColumn(label: Text('Reorder Threshold')),
-                  DataColumn(label: Text('Status')),
+                  DataColumn(label: Text('Item Name', style: TextStyle(color: Colors.white))),
+                  DataColumn(label: Text('Current Stock', style: TextStyle(color: Colors.white))),
+                  DataColumn(label: Text('Reorder Threshold', style: TextStyle(color: Colors.white))),
+                  DataColumn(label: Text('Status', style: TextStyle(color: Colors.white))),
                 ],
                 rows: [
                   _buildInventoryTableRow('Widget A', '250', '100', Colors.green),
@@ -283,9 +284,9 @@ class _MaindashboardState extends State<Maindashboard> {
       String itemName, String currentStock, String reorderThreshold, Color statusColor) {
     return DataRow(
       cells: [
-        DataCell(Text(itemName)),
-        DataCell(Text(currentStock)),
-        DataCell(Text(reorderThreshold)),
+        DataCell(Text(itemName, style: const TextStyle(color: Colors.white))),
+        DataCell(Text(currentStock, style: const TextStyle(color: Colors.white))),
+        DataCell(Text(reorderThreshold, style: const TextStyle(color: Colors.white))),
         DataCell(
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -314,6 +315,7 @@ class _MaindashboardState extends State<Maindashboard> {
 
   Widget _buildAlertsSection() {
     return Card(
+      color: const Color(0xFF123D59), // Blue-teal background for alerts
       elevation: 4,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -325,6 +327,7 @@ class _MaindashboardState extends State<Maindashboard> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
+                color: Colors.white, // White text for Alerts
               ),
             ),
             const SizedBox(height: 10),
@@ -358,8 +361,7 @@ class _MaindashboardState extends State<Maindashboard> {
     );
   }
 
-  Widget _buildAlertItem(
-      String title, String subtitle, IconData icon, Color color) {
+  Widget _buildAlertItem(String title, String subtitle, IconData icon, Color color) {
     return ListTile(
       leading: Icon(icon, color: color),
       title: Text(
@@ -369,7 +371,7 @@ class _MaindashboardState extends State<Maindashboard> {
           color: color,
         ),
       ),
-      subtitle: Text(subtitle),
+      subtitle: Text(subtitle, style: const TextStyle(color: Colors.white)),
     );
   }
 }
