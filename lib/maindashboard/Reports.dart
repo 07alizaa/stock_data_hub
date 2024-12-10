@@ -1,6 +1,48 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'InventoryManagement.dart';
+import 'DashboardPage.dart'; // Import Dashboard Page
 
-class ReportsPage extends StatelessWidget {
+class ReportsPage extends StatefulWidget {
+  @override
+  State<ReportsPage> createState() => _ReportsPageState();
+}
+
+class _ReportsPageState extends State<ReportsPage> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Map<String, dynamic> todaySale = {
+    "amount": "Rs0.0",
+    "highestSale": "Rs0.0",
+    "highlight": "No data available",
+  };
+  Map<String, dynamic> lastWeekSale = {
+    "amount": "Rs0.0",
+    "customers": "0",
+    "highlight": "No data available",
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchReportsData();
+  }
+
+  void _fetchReportsData() async {
+    try {
+      final todayData = await _firestore.collection('sales').doc('today').get();
+      final lastWeekData =
+      await _firestore.collection('sales').doc('lastWeek').get();
+
+      setState(() {
+        todaySale = todayData.data() ?? todaySale;
+        lastWeekSale = lastWeekData.data() ?? lastWeekSale;
+      });
+    } catch (e) {
+      print("Error fetching sales data: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -16,7 +58,7 @@ class ReportsPage extends StatelessWidget {
           children: [
             ElevatedButton(
               onPressed: () {
-                // Sales Report Action
+                _showSalesReportDialog();
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF123D59),
@@ -31,32 +73,26 @@ class ReportsPage extends StatelessWidget {
 
             // Today's Sales Report Card
             _buildReportCard(
-                context,
-                title: "TODAY'S SALE",
-                amount: "Rs20,000 K",
-                details: "Rs6,600 is today's highest sale",
-                highlight: "Coke is top selling beverage."
+              title: "TODAY'S SALE",
+              amount: todaySale["amount"],
+              details: todaySale["highestSale"],
+              highlight: todaySale["highlight"],
             ),
             const SizedBox(height: 16.0),
 
             // Last Week Sales Report Card
             _buildReportCard(
-                context,
-                title: "LAST WEEK SALE",
-                amount: "\$14.2 K",
-                details: "Approx 24 customers arrived",
-                highlight: "Coke is top selling beverage."
+              title: "LAST WEEK SALE",
+              amount: lastWeekSale["amount"],
+              details:
+              "Approx ${lastWeekSale["customers"]} customers arrived",
+              highlight: lastWeekSale["highlight"],
             ),
-
-
-
             const Spacer(),
 
             // Generate Custom Report Button
             ElevatedButton(
-              onPressed: () {
-                // Generate Custom Report Action
-              },
+              onPressed: _generateCustomReport,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFFF9900),
                 foregroundColor: Colors.white,
@@ -81,6 +117,21 @@ class ReportsPage extends StatelessWidget {
         backgroundColor: const Color(0xFF123D59),
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.grey,
+        onTap: (index) {
+          if (index == 1) {
+            // Navigate to Inventory Management Page
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => InventoryManagementPage()),
+            );
+          } else if (index == 2) {
+            // Navigate to Dashboard Page
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => DashboardPage()),
+            );
+          }
+        },
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -99,8 +150,12 @@ class ReportsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildReportCard(BuildContext context,
-      {required String title, required String amount, required String details, required String highlight}) {
+  Widget _buildReportCard({
+    required String title,
+    required String amount,
+    required String details,
+    required String highlight,
+  }) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16.0),
@@ -147,5 +202,43 @@ class ReportsPage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void _showSalesReportDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Sales Report'),
+          content: const Text(
+            'Detailed sales report is generated from Firebase dynamically.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _generateCustomReport() async {
+    try {
+      await _firestore.collection('customReports').add({
+        'generatedAt': FieldValue.serverTimestamp(),
+        'details': 'Custom sales report generated successfully!',
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Custom Report Generated!")),
+      );
+    } catch (e) {
+      print("Error generating custom report: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Failed to generate custom report")),
+      );
+    }
   }
 }

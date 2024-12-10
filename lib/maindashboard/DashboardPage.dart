@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'AddProduct.dart';
+// import 'AddProduct.dart';
 import 'InventoryManagement.dart';
 import 'Reports.dart';
 import 'SettingPage.dart';
-
 
 class DashboardPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dashboard'),
+        title: const Text('Welcome to Dashboard Page'),
         backgroundColor: const Color(0xFF123D59),
         centerTitle: true,
       ),
@@ -24,17 +23,17 @@ class DashboardPage extends StatelessWidget {
                 crossAxisSpacing: 16.0,
                 mainAxisSpacing: 16.0,
                 children: [
-                  _buildDashboardCard(
-                    context,
-                    label: "Add Product",
-                    icon: Icons.add_circle,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const AddProductPage()),
-                      );
-                    },
-                  ),
+                  // _buildDashboardCard(
+                  //   context,
+                  //   label: "Add Product",
+                  //   icon: Icons.add_circle,
+                  //   onTap: () {
+                  //     Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(builder: (context) => const AddProductPage()),
+                  //     );
+                  //   },
+                  // ),
                   _buildDashboardCard(
                     context,
                     label: "Inventory Management",

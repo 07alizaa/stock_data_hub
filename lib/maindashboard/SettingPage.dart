@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // For local storage
+// import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Firebase for logout functionality
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -12,6 +15,28 @@ class _SettingsPageState extends State<SettingsPage> {
   bool pushNotifications = true;
   String selectedLanguage = 'English';
   final List<String> languages = ['English', 'Spanish', 'French', 'German'];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPreferences(); // Load saved preferences on startup
+  }
+
+  Future<void> _loadPreferences() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      isDarkMode = prefs.getBool('isDarkMode') ?? false;
+      pushNotifications = prefs.getBool('pushNotifications') ?? true;
+      selectedLanguage = prefs.getString('selectedLanguage') ?? 'English';
+    });
+  }
+
+  Future<void> _savePreferences() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isDarkMode', isDarkMode);
+    await prefs.setBool('pushNotifications', pushNotifications);
+    await prefs.setString('selectedLanguage', selectedLanguage);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +64,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 onChanged: (value) {
                   setState(() {
                     isDarkMode = value;
+                    _savePreferences(); // Save updated preference
                   });
                 },
               ),
@@ -48,6 +74,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 onChanged: (value) {
                   setState(() {
                     pushNotifications = value;
+                    _savePreferences(); // Save updated preference
                   });
                 },
               ),
@@ -64,17 +91,14 @@ class _SettingsPageState extends State<SettingsPage> {
                 subtitle: const Text("Version 1.0.0"),
                 trailing: const Icon(Icons.info_outline, color: Colors.black),
                 onTap: () {
-                  // About section functionality
+                  _showAboutDialog();
                 },
               ),
               const SizedBox(height: 20),
 
               Center(
                 child: ElevatedButton(
-                  onPressed: () {
-                    // Handle logout functionality
-                    Navigator.pop(context);
-                  },
+                  onPressed: _logout,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
                     padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 50),
@@ -128,7 +152,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Widget _buildSwitchTile({required String title, required bool value, required ValueChanged<bool> onChanged}) {
     return SwitchListTile(
-      tileColor: Colors.white,
+      tileColor: const Color(0xFF123D59),
       title: Text(
         title,
         style: const TextStyle(color: Colors.white),
@@ -151,6 +175,7 @@ class _SettingsPageState extends State<SettingsPage> {
       onChanged: (value) {
         setState(() {
           selectedLanguage = value!;
+          _savePreferences(); // Save updated preference
         });
       },
       decoration: InputDecoration(
@@ -163,5 +188,28 @@ class _SettingsPageState extends State<SettingsPage> {
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       ),
     );
+  }
+
+  void _showAboutDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("About the App"),
+          content: const Text("This app is developed to manage inventory, generate reports, and more."),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Close"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _logout() async {
+    await FirebaseAuth.instance.signOut();
+    Navigator.pop(context); // Navigate back to login or home screen
   }
 }
