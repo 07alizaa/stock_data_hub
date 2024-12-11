@@ -6,7 +6,6 @@ import 'AlertsNotificationScreen.dart';
 import 'WInventoryManagement.dart';
 import 'TaskManagementScreen.dart';
 import 'DemandForecastScreen.dart';
-import 'package:stock_data_hub/StockManagement/Stockmanagement.dart'; // Placeholder for Stock Management
 import 'package:stock_data_hub/WHistory/History.dart'; // Placeholder for History
 
 class MainDashboard extends StatefulWidget {
@@ -73,13 +72,6 @@ class _MainDashboardState extends State<MainDashboard> {
               screen: TasksManagement(),
             ),
 
-            // Stock Management
-            _buildNavigationTile(
-              context,
-              icon: Icons.outbox,
-              title: 'Stock Management',
-              screen: StockManagement(),
-            ),
 
             // History
             _buildNavigationTile(
