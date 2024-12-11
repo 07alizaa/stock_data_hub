@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class TasksManagement extends StatefulWidget {
-  const TasksManagement({Key? key}) : super(key: key);
+  const TasksManagement({super.key});
 
   @override
   _TasksManagementState createState() => _TasksManagementState();

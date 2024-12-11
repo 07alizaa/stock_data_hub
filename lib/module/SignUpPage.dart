@@ -1,9 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import '../WareHousePages/MainDashboard.dart';
+import '../maindashboard/DashboardPage.dart';
+import 'package:stock_data_hub/module/LoginPage.dart'; // Replace with the actual path to your LoginPage widget
 
 class SignUpPage extends StatefulWidget {
-  const SignUpPage({Key? key}) : super(key: key);
+  const SignUpPage({super.key});
 
   @override
   State<SignUpPage> createState() => _SignUpPageState();
@@ -16,7 +19,7 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController addressController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   String? selectedRole;
-  final List<String> roles = ['Customer', 'Seller', 'Admin'];
+  final List<String> roles = ['WareHouse', 'Suppliers', 'Admin'];
   bool isHidePassword = true;
   bool _isEmailValid = true;
   bool _isPasswordValid = true;
@@ -196,6 +199,15 @@ class _SignUpPageState extends State<SignUpPage> {
       return;
     }
 
+    // Show a loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+
     try {
       // Register user with Firebase Auth
       UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
@@ -213,15 +225,26 @@ class _SignUpPageState extends State<SignUpPage> {
         'role': selectedRole,
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Sign up successful')),
-      );
+      // Hide loading indicator
       Navigator.of(context).pop();
+
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Registration complete. Please log in.')),
+      );
+
+      // Navigate to Login Page
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+      );
     } on FirebaseAuthException catch (e) {
+      Navigator.of(context).pop(); // Hide loading indicator
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: ${e.message}')),
       );
     } catch (e) {
+      Navigator.of(context).pop(); // Hide loading indicator
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
       );
