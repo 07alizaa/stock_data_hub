@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class AlertsNotifications extends StatefulWidget {
+  const AlertsNotifications({super.key});
+
   @override
   _AlertsNotificationsState createState() => _AlertsNotificationsState();
 }
@@ -32,11 +34,11 @@ class _AlertsNotificationsState extends State<AlertsNotifications> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Alerts & Notifications'),
+        title: const Text('Alerts & Notifications'),
         backgroundColor: const Color(0xFF123D59), // Dark teal color
       ),
       body: Container(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         color: const Color(0xFFF5F0E1), // Nude color background
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -61,7 +63,7 @@ class _AlertsNotificationsState extends State<AlertsNotifications> {
                     color: notification['read']
                         ? Colors.blue.shade100
                         : const Color(0xFF123D59), // Dark teal for unread notifications
-                    margin: EdgeInsets.symmetric(vertical: 8.0),
+                    margin: const EdgeInsets.symmetric(vertical: 8.0),
                     child: ListTile(
                       leading: Icon(
                         Icons.notifications,
@@ -71,19 +73,19 @@ class _AlertsNotificationsState extends State<AlertsNotifications> {
                       ),
                       title: Text(
                         notification['title'],
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
                       subtitle: Text(
                         notification['detail'],
-                        style: TextStyle(color: Colors.white70),
+                        style: const TextStyle(color: Colors.white70),
                       ),
                       trailing: notification['read']
                           ? null
                           : IconButton(
-                        icon: Icon(Icons.check_circle),
+                        icon: const Icon(Icons.check_circle),
                         color: Colors.white,
                         onPressed: () => markAsRead(index),
                       ),
@@ -92,14 +94,14 @@ class _AlertsNotificationsState extends State<AlertsNotifications> {
                 },
               ),
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: clearNotifications,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFECA25B),
-                padding: EdgeInsets.symmetric(vertical: 12.0),
+                padding: const EdgeInsets.symmetric(vertical: 12.0),
               ),
-              child: Text(
+              child: const Text(
                 "Clear All Notifications",
                 style: TextStyle(
                   color: Colors.black,

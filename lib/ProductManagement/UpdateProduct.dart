@@ -5,10 +5,10 @@ class Updateproduct extends StatefulWidget {
   final Function(Map<String, dynamic>) onUpdate;
 
   const Updateproduct({
-    Key? key,
+    super.key,
     required this.product,
     required this.onUpdate,
-  }) : super(key: key);
+  });
 
   @override
   State<Updateproduct> createState() => _UpdateProductState();

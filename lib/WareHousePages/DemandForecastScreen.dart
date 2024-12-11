@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class DemandForecastScreen extends StatefulWidget {
-  const DemandForecastScreen({Key? key}) : super(key: key);
+  const DemandForecastScreen({super.key});
 
   @override
   _DemandForecastScreenState createState() => _DemandForecastScreenState();

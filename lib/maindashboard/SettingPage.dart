@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart'; // For local storag
 import 'package:firebase_auth/firebase_auth.dart'; // Firebase for logout functionality
 
 class SettingsPage extends StatefulWidget {
-  const SettingsPage({Key? key}) : super(key: key);
+  const SettingsPage({super.key});
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();

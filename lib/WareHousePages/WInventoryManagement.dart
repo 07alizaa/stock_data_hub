@@ -3,7 +3,7 @@ import 'package:stock_data_hub/ProductManagement/UpdateProduct.dart';
 import 'package:stock_data_hub/ProductManagement/AddNewProduct.dart'; // Import your UpdateProduct widget
 
 class InventoryManagementScreen extends StatefulWidget {
-  const InventoryManagementScreen({Key? key}) : super(key: key);
+  const InventoryManagementScreen({super.key});
 
   @override
   State<InventoryManagementScreen> createState() =>
@@ -203,7 +203,7 @@ class _InventoryManagementScreenState extends State<InventoryManagementScreen> {
       onPressed: () async {
         final newProduct = await Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => AddNewProduct(),
+            builder: (context) => const AddNewProduct(),
           ),
         );
 

@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:stock_data_hub/dashboard/suppliers.dart';
+import 'package:stock_data_hub/maindashboard/DashboardPage.dart';
 import '../WareHousePages/MainDashboard.dart';
 import '../forgetpassword/ForgotPassword.dart';
 
@@ -8,7 +10,7 @@ import 'SignUpPage.dart';
 // import 'MainDashboard.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({super.key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -166,7 +168,7 @@ class _LoginPageState extends State<LoginPage> {
                                   Container(
                                     width: 50,
                                     height: 50,
-                                    decoration: BoxDecoration(
+                                    decoration: const BoxDecoration(
                                       shape: BoxShape.circle,
                                       color: Colors.white,
                                     ),
@@ -180,7 +182,7 @@ class _LoginPageState extends State<LoginPage> {
                                   Container(
                                     width: 50,
                                     height: 50,
-                                    decoration: BoxDecoration(
+                                    decoration: const BoxDecoration(
                                       shape: BoxShape.circle,
                                       color: Colors.white,
                                     ),
@@ -225,23 +227,74 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _login() async {
+    // Show loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+
     try {
+      // Sign in the user with email and password
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
 
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => Maindashboard()),
-            (route) => false,
-      );
+      // Get the user ID
+      String userId = userCredential.user?.uid ?? '';
+
+      // Fetch user role from Firestore
+      DocumentSnapshot userDoc = await _firestore.collection('users').doc(userId).get();
+
+      // Close loading indicator
+      Navigator.of(context).pop();
+
+      if (userDoc.exists) {
+        String? role = userDoc['role'];
+
+        // Navigate to the respective dashboard based on the role
+        if (role == 'Admin') {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const DashboardPage()), // Admin dashboard
+                (route) => false,
+          );
+        } else if (role == 'WareHouse') {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const Maindashboard()), // Warehouse dashboard
+                (route) => false,
+          );
+        } else if (role == 'Suppliers') {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const SuppliersPage()), // Supplier dashboard
+                (route) => false,
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Role not recognized. Please contact support.')),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('User data not found. Please contact support.')),
+        );
+      }
     } catch (e) {
+      // Close loading indicator
+      Navigator.of(context).pop();
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
+        SnackBar(content: Text('Error: ${e.toString()}')),
       );
     }
   }
+
+
 
   void _togglePasswordView() {
     setState(() {

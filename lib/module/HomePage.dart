@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/animation.dart';
 import 'LoginPage.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -71,7 +70,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 const SizedBox(height: 40),
                 ScaleTransition(
                   scale: _imageAnimation,
-                  child: Container(
+                  child: SizedBox(
                     height: 200,
                     child: Image.asset(
                       'assets/logo.png', // Add your illustration here
@@ -94,12 +93,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 16),
                   ),
-                  child: SizedBox(
+                  child: const SizedBox(
                     width: 200, // Adjust the width to your desired size
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
+                        Text(
                           'Get Started',
                           style: TextStyle(
                             color: Colors.white,
@@ -107,8 +106,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             fontSize: 18,
                           ),
                         ),
-                        const SizedBox(width: 8), // Add space between text and icon
-                        const Icon(Icons.arrow_forward, color: Colors.white),
+                        SizedBox(width: 8), // Add space between text and icon
+                        Icon(Icons.arrow_forward, color: Colors.white),
                       ],
                     ),
                   ),

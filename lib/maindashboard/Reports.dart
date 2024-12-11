@@ -4,6 +4,8 @@ import 'InventoryManagement.dart';
 import 'DashboardPage.dart'; // Import Dashboard Page
 
 class ReportsPage extends StatefulWidget {
+  const ReportsPage({super.key});
+
   @override
   State<ReportsPage> createState() => _ReportsPageState();
 }
@@ -122,13 +124,13 @@ class _ReportsPageState extends State<ReportsPage> {
             // Navigate to Inventory Management Page
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => InventoryManagementPage()),
+              MaterialPageRoute(builder: (context) => const InventoryManagementPage()),
             );
           } else if (index == 2) {
             // Navigate to Dashboard Page
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => DashboardPage()),
+              MaterialPageRoute(builder: (context) => const DashboardPage()),
             );
           }
         },

@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 import 'dart:math';
-import 'ChangePassword.dart';
+import '../module/LoginPage.dart';
 
 class SendCodePage extends StatefulWidget {
   final String email;
   final String verificationCode;
 
-  const SendCodePage({Key? key, required this.email, required this.verificationCode}) : super(key: key);
+  const SendCodePage({super.key, required this.email, required this.verificationCode});
 
   @override
   _SendCodePageState createState() => _SendCodePageState();
@@ -35,8 +35,8 @@ class _SendCodePageState extends State<SendCodePage> {
   }
 
   Future<void> _sendEmailWithOTP() async {
-    String username = 'Lunabhattarai100@gmail.com'; // Replace with your Gmail
-    String password = 'DAV@23711';   // Use the app password generated from Google
+    String username = 'your-email@gmail.com'; // Replace with your Gmail
+    String password = 'your-app-password';   // Use the app password generated from Google
 
     final smtpServer = gmail(username, password);
     final message = Message()
@@ -64,19 +64,18 @@ class _SendCodePageState extends State<SendCodePage> {
   }
 
   void _verifyCode() {
-    String enteredCode =
-    codeControllers.map((controller) => controller.text).join();
+    String enteredCode = codeControllers.map((controller) => controller.text).join();
 
     if (enteredCode == verificationCode) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Verification successful!'),
+          content: Text('Verification successful! Redirecting to Login Page...'),
           duration: Duration(seconds: 2),
         ),
       );
-      Navigator.push(
+      Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const ChangePassword()),
+        MaterialPageRoute(builder: (context) => const LoginPage()), // Redirect to Login Page
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

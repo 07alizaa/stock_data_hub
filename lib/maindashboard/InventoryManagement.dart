@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class InventoryManagementPage extends StatefulWidget {
+  const InventoryManagementPage({super.key});
+
   @override
   State<InventoryManagementPage> createState() => _InventoryManagementPageState();
 }

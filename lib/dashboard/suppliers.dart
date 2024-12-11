@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 class SuppliersPage extends StatefulWidget {
-  const SuppliersPage({Key? key}) : super(key: key);
+  const SuppliersPage({super.key});
 
   @override
   _SuppliersPageState createState() => _SuppliersPageState();

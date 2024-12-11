@@ -5,6 +5,8 @@ import 'TaskManagementScreen.dart';
 import 'DemandForecastScreen.dart';
 
 class Maindashboard extends StatefulWidget {
+  const Maindashboard({super.key});
+
   @override
   _MaindashboardState createState() => _MaindashboardState();
 }
@@ -25,20 +27,20 @@ class _MaindashboardState extends State<Maindashboard> {
             color: Colors.white, // Title text in white color
           ),
         ),
-        actions: [
+        actions: const [
           Padding(
-            padding: const EdgeInsets.only(right: 16.0),
+            padding: EdgeInsets.only(right: 16.0),
             child: Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: const Color(0xFF123D59),
-                  backgroundImage: const NetworkImage(
+                  backgroundColor: Color(0xFF123D59),
+                  backgroundImage: NetworkImage(
                     'https://via.placeholder.com/150', // Placeholder profile image
                   ),
                   radius: 20,
                 ),
-                const SizedBox(width: 10),
-                const Column(
+                SizedBox(width: 10),
+                Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -88,7 +90,7 @@ class _MaindashboardState extends State<Maindashboard> {
           } else if (index == 1) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => InventoryManagementScreen()),
+              MaterialPageRoute(builder: (context) => const InventoryManagementScreen()),
             );
           } else if (index == 2) {
             Navigator.push(
@@ -98,7 +100,7 @@ class _MaindashboardState extends State<Maindashboard> {
           } else if (index == 3) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => AlertsNotifications()),
+              MaterialPageRoute(builder: (context) => const AlertsNotifications()),
             );
           } else if (index == 4) {
             Navigator.push(

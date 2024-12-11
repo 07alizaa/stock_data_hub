@@ -5,6 +5,8 @@ import 'Reports.dart';
 import 'SettingPage.dart';
 
 class DashboardPage extends StatelessWidget {
+  const DashboardPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,7 +43,7 @@ class DashboardPage extends StatelessWidget {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => InventoryManagementPage()),
+                        MaterialPageRoute(builder: (context) => const InventoryManagementPage()),
                       );
                     },
                   ),
@@ -52,7 +54,7 @@ class DashboardPage extends StatelessWidget {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => ReportsPage()),
+                        MaterialPageRoute(builder: (context) => const ReportsPage()),
                       );
                     },
                   ),
