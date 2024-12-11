@@ -6,18 +6,27 @@ import 'AlertsNotificationScreen.dart';
 import 'WInventoryManagement.dart';
 import 'TaskManagementScreen.dart';
 import 'DemandForecastScreen.dart';
-import 'package:stock_data_hub/ProductManagement/AddNewProduct.dart';
-import 'package:stock_data_hub/ProductManagement/UpdateProduct.dart';
+import 'package:stock_data_hub/StockManagement/Stockmanagement.dart'; // Placeholder for Stock Management
+import 'package:stock_data_hub/WHistory/History.dart'; // Placeholder for History
 
-class MainDashboard extends StatelessWidget {
+class MainDashboard extends StatefulWidget {
+  @override
+  _MainDashboardState createState() => _MainDashboardState();
+}
+
+class _MainDashboardState extends State<MainDashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF123D59),
-        title: const Text('Warehouse Manager Dashboard'),
+        title: const Text(
+          'Warehouse Manager Dashboard',
+          style: TextStyle(color: Colors.white), // White text
+        ),
       ),
-      body: Padding(
+      body: Container(
+        color: const Color(0xFFF5E8D8), // Beige background
         padding: const EdgeInsets.all(16.0),
         child: GridView.count(
           crossAxisCount: 2,
@@ -48,35 +57,6 @@ class MainDashboard extends StatelessWidget {
               screen: InventoryManagementScreen(),
             ),
 
-            // Add New Product
-            _buildNavigationTile(
-              context,
-              icon: Icons.add_box,
-              title: 'Add New Product',
-              screen: AddNewProduct(),
-            ),
-
-            // Update Product
-            _buildNavigationTile(
-              context,
-              icon: Icons.update,
-              title: 'Update Product',
-              screen: Updateproduct(
-                product: {
-                  'name': 'Sample Product',
-                  'quantity': 100,
-                  'description': 'Sample Description',
-                  'price': 19.99,
-                  'lowStockThreshold': 10,
-                  'demandForecast': 50,
-                  'status': 'Available',
-                },
-                onUpdate: (updatedProduct) {
-                  print('Updated Product: $updatedProduct');
-                },
-              ),
-            ),
-
             // Demand Forecast
             _buildNavigationTile(
               context,
@@ -91,6 +71,22 @@ class MainDashboard extends StatelessWidget {
               icon: Icons.task,
               title: 'Task Management',
               screen: TasksManagement(),
+            ),
+
+            // Stock Management
+            _buildNavigationTile(
+              context,
+              icon: Icons.outbox,
+              title: 'Stock Management',
+              screen: StockManagement(),
+            ),
+
+            // History
+            _buildNavigationTile(
+              context,
+              icon: Icons.history,
+              title: 'History',
+              screen: HistoryScreen(),
             ),
           ],
         ),
@@ -110,7 +106,10 @@ class MainDashboard extends StatelessWidget {
       },
       child: Card(
         elevation: 4,
-        color: const Color(0xFF123D59),
+        color: const Color(0xFF123D59), // Dark tile background
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0), // Rounded corners
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

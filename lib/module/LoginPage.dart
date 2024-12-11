@@ -265,7 +265,7 @@ class _LoginPageState extends State<LoginPage> {
         } else if (role == 'WareHouse') {
           Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (context) => const DashboardPage()), // Warehouse dashboard
+            MaterialPageRoute(builder: (context) =>  MainDashboard()), // Warehouse dashboard
                 (route) => false,
           );
         } else if (role == 'Suppliers') {
