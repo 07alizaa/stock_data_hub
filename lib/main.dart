@@ -2,12 +2,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:stock_data_hub/WareHousePages/MainDashboard.dart';
 import 'firebase_options.dart';
-import 'forgetpassword/ChangePassword.dart';
-import 'forgetpassword/ForgotPassword.dart';
+import 'module/HomePage.dart';
 import 'module/LoginPage.dart';
-
-import 'WareHousePages/WInventoryManagement.dart';
-
+// import 'module/ChangePassword.dart';
+// import 'module/ForgotPassword.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,7 +16,6 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -27,8 +24,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home:  Maindashboard (),
-
+      home: const HomePage(), // Change to Maindashboard() if needed
     );
   }
 }

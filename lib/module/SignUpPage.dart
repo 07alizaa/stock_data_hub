@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import '../WareHousePages/MainDashboard.dart';
 import '../maindashboard/DashboardPage.dart';
- // Import the dashboard page
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
@@ -219,11 +219,16 @@ class _SignUpPageState extends State<SignUpPage> {
         const SnackBar(content: Text('Sign up successful')),
       );
 
-      // Navigate to dashboard if role is Admin
+      // Navigate based on the role
       if (selectedRole == 'Admin') {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => DashboardPage()),
+        );
+      } else if (selectedRole == 'WareHouse') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => Maindashboard()),
         );
       } else {
         Navigator.of(context).pop();
