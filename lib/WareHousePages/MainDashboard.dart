@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'WInventoryManagement.dart';
 import 'AlertsNotificationScreen.dart';
 import 'TaskManagementScreen.dart';
 import 'DemandForecastScreen.dart';
@@ -88,10 +87,10 @@ class _MaindashboardState extends State<Maindashboard> {
           if (index == 0) {
             // Stay on the home screen
           } else if (index == 1) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const InventoryManagementScreen()),
-            );
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(builder: (context) => const InventoryManagementScreen()),
+            // );
           } else if (index == 2) {
             Navigator.push(
               context,

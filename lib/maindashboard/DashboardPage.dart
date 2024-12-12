@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-// import 'AddProduct.dart';
-import 'InventoryManagement.dart';
-import 'Reports.dart';
+
+import '../ProductManagement/AddNewProduct.dart';
+
 import 'SettingPage.dart';
+import 'WinventoryManagement.dart';
+
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
@@ -11,7 +13,7 @@ class DashboardPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Welcome to Dashboard Page'),
+        title: const Text('Dashboard'),
         backgroundColor: const Color(0xFF123D59),
         centerTitle: true,
       ),
@@ -25,17 +27,14 @@ class DashboardPage extends StatelessWidget {
                 crossAxisSpacing: 16.0,
                 mainAxisSpacing: 16.0,
                 children: [
-                  // _buildDashboardCard(
-                  //   context,
-                  //   label: "Add Product",
-                  //   icon: Icons.add_circle,
-                  //   onTap: () {
-                  //     Navigator.push(
-                  //       context,
-                  //       MaterialPageRoute(builder: (context) => const AddProductPage()),
-                  //     );
-                  //   },
-                  // ),
+                  _buildDashboardCard(
+                    context,
+                    label: "Dashboard Overview",
+                    icon: Icons.dashboard,
+                    onTap: () {
+                      // Add navigation logic for Dashboard Overview
+                    },
+                  ),
                   _buildDashboardCard(
                     context,
                     label: "Inventory Management",
@@ -43,19 +42,29 @@ class DashboardPage extends StatelessWidget {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const InventoryManagementPage()),
+                        MaterialPageRoute(
+                          builder: (context) => const InventoryManagementScreen(),
+                        ),
                       );
                     },
                   ),
+
+
+
                   _buildDashboardCard(
                     context,
                     label: "Reports",
                     icon: Icons.bar_chart,
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const ReportsPage()),
-                      );
+                      // Add navigation logic for Reports
+                    },
+                  ),
+                  _buildDashboardCard(
+                    context,
+                    label: "History",
+                    icon: Icons.history,
+                    onTap: () {
+                      // Add navigation logic for History
                     },
                   ),
                   _buildDashboardCard(
@@ -65,7 +74,9 @@ class DashboardPage extends StatelessWidget {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const SettingsPage()),
+                        MaterialPageRoute(
+                          builder: (context) => const SettingsPage(),
+                        ),
                       );
                     },
                   ),
@@ -74,6 +85,16 @@ class DashboardPage extends StatelessWidget {
             ),
           ],
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: const Color(0xFF123D59),
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.grey,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.notifications), label: "Notifications"),
+        ],
       ),
     );
   }

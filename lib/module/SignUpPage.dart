@@ -1,8 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../WareHousePages/MainDashboard.dart';
-import '../maindashboard/DashboardPage.dart';
 import 'package:stock_data_hub/module/LoginPage.dart'; // Replace with the actual path to your LoginPage widget
 
 class SignUpPage extends StatefulWidget {

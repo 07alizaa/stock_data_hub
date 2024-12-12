@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'InventoryManagement.dart';
+
 import 'DashboardPage.dart'; // Import Dashboard Page
 
 class ReportsPage extends StatefulWidget {
@@ -18,6 +18,7 @@ class _ReportsPageState extends State<ReportsPage> {
     "highestSale": "Rs0.0",
     "highlight": "No data available",
   };
+
   Map<String, dynamic> lastWeekSale = {
     "amount": "Rs0.0",
     "customers": "0",
@@ -124,7 +125,7 @@ class _ReportsPageState extends State<ReportsPage> {
             // Navigate to Inventory Management Page
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const InventoryManagementPage()),
+              MaterialPageRoute(builder: (context) => const DashboardPage()),
             );
           } else if (index == 2) {
             // Navigate to Dashboard Page
