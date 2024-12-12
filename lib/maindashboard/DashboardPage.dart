@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:stock_data_hub/DashboardOverview/DashboardOverviewScreen.dart';
 
 import '../ProductManagement/AddNewProduct.dart';
 
+import '../WareHousePages/TaskManagementScreen.dart';
 import 'SettingPage.dart';
 import 'package:stock_data_hub/WareHousePages/WinventoryManagement.dart';
 
@@ -30,9 +32,14 @@ class DashboardPage extends StatelessWidget {
                   _buildDashboardCard(
                     context,
                     label: "Dashboard Overview",
-                    icon: Icons.dashboard,
+                    icon: Icons.inventory,
                     onTap: () {
-                      // Add navigation logic for Dashboard Overview
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const Dashboardscreen(),
+                        ),
+                      );
                     },
                   ),
                   _buildDashboardCard(
@@ -44,6 +51,20 @@ class DashboardPage extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) => const InventoryManagementScreen(),
+                        ),
+                      );
+                    },
+                  ),
+
+                  _buildDashboardCard(
+                    context,
+                    label: "TaskManagement",
+                    icon: Icons.inventory,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>  TasksManagement(),
                         ),
                       );
                     },

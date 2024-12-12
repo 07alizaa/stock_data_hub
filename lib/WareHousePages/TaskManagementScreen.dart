@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TasksManagement extends StatefulWidget {
   @override
@@ -11,18 +12,16 @@ class _TasksManagementState extends State<TasksManagement> {
   int dispatchedQuantity = 0;
   String destination = '';
   String dispatchDate = '';
-  String notes = '';
   String status = 'Pending';
   String priority = 'Normal Priority';
 
   // Dummy data for inventory products
   final List<String> inventoryProducts = ['Product A', 'Product B', 'Product C'];
 
-  // List to hold outgoing stock records
-  final List<Map<String, dynamic>> outgoingStockRecords = [];
-
   // Status filter
   String statusFilter = 'All';
+
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -35,15 +34,13 @@ class _TasksManagementState extends State<TasksManagement> {
         ),
       ),
       body: Container(
-        color: const Color(0xFFF5E8D8), // Beige background
+        color: const Color(0xFFF5E8D8),
         child: Column(
           children: [
-            // Filter dropdown below AppBar
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: _buildFilterDropdown(),
             ),
-            // Wrapping Form and List in an expandable layout
             Expanded(
               child: SingleChildScrollView(
                 child: Padding(
@@ -67,7 +64,7 @@ class _TasksManagementState extends State<TasksManagement> {
   Widget _buildForm() {
     return Card(
       elevation: 4,
-      color: const Color(0xFF123D59), // Blue background
+      color: const Color(0xFF123D59),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
       ),
@@ -77,7 +74,6 @@ class _TasksManagementState extends State<TasksManagement> {
           key: _formKey,
           child: Column(
             children: [
-              // Product Selector
               DropdownButtonFormField<String>(
                 value: selectedProduct.isNotEmpty ? selectedProduct : null,
                 decoration: const InputDecoration(
@@ -102,26 +98,30 @@ class _TasksManagementState extends State<TasksManagement> {
                 value == null || value.isEmpty ? 'Please select a product' : null,
               ),
               const SizedBox(height: 10),
-
-              // Quantity Field
-              _buildTextField('Dispatched Quantity', (value) {
-                dispatchedQuantity = int.tryParse(value!) ?? 0;
-              }, TextInputType.number),
+              _buildTextField(
+                'Dispatched Quantity',
+                    (value) {
+                  dispatchedQuantity = int.tryParse(value!) ?? 0;
+                },
+                TextInputType.number,
+              ),
               const SizedBox(height: 10),
-
-              // Destination Field
-              _buildTextField('Destination (e.g., Supplier Name)', (value) {
-                destination = value!;
-              }, TextInputType.text),
+              _buildTextField(
+                'Destination (e.g., Supplier Name)',
+                    (value) {
+                  destination = value!;
+                },
+                TextInputType.text,
+              ),
               const SizedBox(height: 10),
-
-              // Dispatch Date Field
-              _buildTextField('Dispatch Date (YYYY-MM-DD)', (value) {
-                dispatchDate = value!;
-              }, TextInputType.datetime),
+              _buildTextField(
+                'Dispatch Date (YYYY-MM-DD)',
+                    (value) {
+                  dispatchDate = value!;
+                },
+                TextInputType.datetime,
+              ),
               const SizedBox(height: 10),
-
-              // Priority Field
               DropdownButtonFormField<String>(
                 value: priority,
                 decoration: const InputDecoration(
@@ -143,8 +143,6 @@ class _TasksManagementState extends State<TasksManagement> {
                 },
               ),
               const SizedBox(height: 10),
-
-              // Status Field
               DropdownButtonFormField<String>(
                 value: status,
                 decoration: const InputDecoration(
@@ -166,14 +164,12 @@ class _TasksManagementState extends State<TasksManagement> {
                 },
               ),
               const SizedBox(height: 20),
-
-              // Save Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _saveOutgoingStock,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFFA726), // Orange button
+                    backgroundColor: const Color(0xFFFFA726),
                     padding: const EdgeInsets.symmetric(vertical: 15),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -192,11 +188,8 @@ class _TasksManagementState extends State<TasksManagement> {
     );
   }
 
-  Widget _buildTextField(
-      String label,
-      Function(String?) onSaved,
-      TextInputType inputType,
-      ) {
+  Widget _buildTextField(String label, Function(String?) onSaved,
+      TextInputType inputType) {
     return TextFormField(
       decoration: InputDecoration(
         labelText: label,
@@ -239,54 +232,48 @@ class _TasksManagementState extends State<TasksManagement> {
   }
 
   Widget _buildOutgoingStockList() {
-    // Filter records based on the selected filter
-    final filteredRecords = outgoingStockRecords.where((record) {
-      if (statusFilter == 'All') return true;
-      return record['status'] == statusFilter;
-    }).toList();
+    return StreamBuilder<QuerySnapshot>(
+      stream: _firestore.collection('outgoingStocks').snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return const Center(child: Text('No records added yet.'));
+        }
 
-    return filteredRecords.isEmpty && outgoingStockRecords.isNotEmpty
-        ? Center(
-      child: Text(
-        'No records found for the selected filter.',
-        style: TextStyle(color: Colors.grey, fontSize: 16),
-      ),
-    )
-        : outgoingStockRecords.isEmpty
-        ? Center(
-      child: Text(
-        'No records added yet. Start by adding a record.',
-        style: TextStyle(color: Colors.grey, fontSize: 16),
-      ),
-    )
-        : ListView.builder(
-      itemCount: filteredRecords.length,
-      itemBuilder: (context, index) {
-        final record = filteredRecords[index];
-        return Card(
-          margin: const EdgeInsets.symmetric(vertical: 8),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: ListTile(
-            title: Text('Product: ${record['product']}'),
-            subtitle: Text(
-              'Quantity: ${record['quantity']}\n'
-                  'Destination: ${record['destination']}\n'
-                  'Date: ${record['date']}\n'
-                  'Priority: ${record['priority']}\n'
-                  'Status: ${record['status']}',
-            ),
-          ),
+        final filteredRecords = snapshot.data!.docs.where((doc) {
+          if (statusFilter == 'All') return true;
+          return doc['status'] == statusFilter;
+        }).toList();
+
+        return ListView.builder(
+          shrinkWrap: true,
+          itemCount: filteredRecords.length,
+          itemBuilder: (context, index) {
+            final record = filteredRecords[index];
+            return Card(
+              margin: const EdgeInsets.symmetric(vertical: 8),
+              child: ListTile(
+                title: Text('Product: ${record['product']}'),
+                subtitle: Text(
+                  'Quantity: ${record['quantity']}\n'
+                      'Destination: ${record['destination']}\n'
+                      'Priority: ${record['priority']}\n'
+                      'Status: ${record['status']}',
+                ),
+              ),
+            );
+          },
         );
       },
     );
   }
 
-  void _saveOutgoingStock() {
+  void _saveOutgoingStock() async {
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        outgoingStockRecords.add({
+      try {
+        await _firestore.collection('outgoingStocks').add({
           'product': selectedProduct,
           'quantity': dispatchedQuantity,
           'destination': destination,
@@ -295,18 +282,24 @@ class _TasksManagementState extends State<TasksManagement> {
           'status': status,
         });
 
-        // Reset form fields
-        selectedProduct = '';
-        dispatchedQuantity = 0;
-        destination = '';
-        dispatchDate = '';
-        priority = 'Normal Priority';
-        status = 'Pending';
-      });
+        setState(() {
+          selectedProduct = '';
+          dispatchedQuantity = 0;
+          destination = '';
+          dispatchDate = '';
+          priority = 'Normal Priority';
+          status = 'Pending';
+        });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Stock record added successfully!')),
-      );
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Stock record added successfully!')),
+        );
+      } catch (e) {
+        print('Error saving record: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error saving record: $e')),
+        );
+      }
     }
   }
 }

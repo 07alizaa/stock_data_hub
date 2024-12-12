@@ -20,24 +20,17 @@ class _DashboardscreenState extends State<Dashboardscreen> {
       ),
       body: SingleChildScrollView(
         child: Container(
-          color: const Color(0xFFF5E8D8), // Beige background
+          color: const Color(0xFFF5E8D8),
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Welcome Section
               _buildWelcomeSection(),
               const SizedBox(height: 20),
-
-              // Quick Stats Section
               _buildQuickStatsSection(),
               const SizedBox(height: 20),
-
-              // Performance Overview Section
               _buildPerformanceOverview(),
               const SizedBox(height: 20),
-
-              // Recent Activities Section
               _buildRecentActivities(),
             ],
           ),
@@ -91,7 +84,7 @@ class _DashboardscreenState extends State<Dashboardscreen> {
       runSpacing: 16,
       children: stats.map((stat) {
         return SizedBox(
-          width: (MediaQuery.of(context).size.width - 48) / 2, // Adjust for spacing
+          width: (MediaQuery.of(context).size.width - 48) / 2,
           child: Card(
             elevation: 4,
             color: const Color(0xFF123D59),
@@ -118,7 +111,6 @@ class _DashboardscreenState extends State<Dashboardscreen> {
                     style: const TextStyle(
                       fontSize: 14,
                       color: Colors.white70,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],

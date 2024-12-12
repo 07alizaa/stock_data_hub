@@ -1,8 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
+
+import 'WareHousePages/MainDashboard.dart';
+
 import 'firebase_options.dart';
 
+import 'maindashboard/DashboardPage.dart';
 import 'module/HomePage.dart';
 
 
@@ -23,7 +27,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const HomePage(), // Change to Maindashboard() if needed
+      home: DashboardPage(), // Change to Maindashboard() if needed
     );
   }
 }
