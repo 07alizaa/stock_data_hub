@@ -1,80 +1,32 @@
 import 'package:flutter/material.dart';
+
+
+// Import other pages
+import 'package:stock_data_hub/DashboardOverview/DashboardOverviewScreen.dart';
+
 import 'AlertsNotificationScreen.dart';
+import 'package:stock_data_hub/maindashboard/WinventoryManagement.dart';
 import 'TaskManagementScreen.dart';
 import 'DemandForecastScreen.dart';
+import 'package:stock_data_hub/WHistory/History.dart'; // Placeholder for History
 
-class Maindashboard extends StatefulWidget {
-  const Maindashboard({super.key});
-
+class MainDashboard extends StatefulWidget {
   @override
-  _MaindashboardState createState() => _MaindashboardState();
+  _MainDashboardState createState() => _MainDashboardState();
 }
 
-class _MaindashboardState extends State<Maindashboard> {
-  int _selectedIndex = 0;
-
+class _MainDashboardState extends State<MainDashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF123D59), // Set background color
       appBar: AppBar(
-        backgroundColor: const Color(0xFF123D59), // Matching background color for AppBar
-        elevation: 0,
+        backgroundColor: const Color(0xFF123D59),
         title: const Text(
           'Warehouse Manager Dashboard',
-          style: TextStyle(
-            color: Colors.white, // Title text in white color
-          ),
-        ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16.0),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  backgroundColor: Color(0xFF123D59),
-                  backgroundImage: NetworkImage(
-                    'https://via.placeholder.com/150', // Placeholder profile image
-                  ),
-                  radius: 20,
-                ),
-                SizedBox(width: 10),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Hello, Warehouse Manager!',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white, // Text in white color
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildQuickStatsSection(),
-              const SizedBox(height: 20),
-              _buildDemandForecastSection(),
-              const SizedBox(height: 20),
-              _buildInventoryTable(),
-              const SizedBox(height: 20),
-              _buildAlertsSection(),
-            ],
-          ),
+          style: TextStyle(color: Colors.white), // White text
         ),
       ),
+
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: const Color(0xFF123D59), // Blue-teal BottomNavigationBar
         currentIndex: _selectedIndex,
@@ -162,217 +114,103 @@ class _MaindashboardState extends State<Maindashboard> {
       color: const Color(0xFF123D59), // Blue-teal background for stats
       elevation: 4,
       child: Padding(
+
+      body: Container(
+        color: const Color(0xFFF5E8D8), // Beige background
+
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: GridView.count(
+          crossAxisCount: 2,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Icon(
-                  icon,
-                  color: color,
-                  size: 30,
-                ),
-                Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: color,
-                  ),
-                ),
-              ],
+            // Dashboard Overview
+            _buildNavigationTile(
+              context,
+              icon: Icons.dashboard,
+              title: 'Dashboard Overview',
+              screen: Dashboardscreen(),
             ),
+
+            // Alerts
+            _buildNavigationTile(
+              context,
+              icon: Icons.notifications,
+              title: 'Alerts',
+              screen: AlertsNotifications(),
+            ),
+
+            // Inventory Management
+            _buildNavigationTile(
+              context,
+              icon: Icons.inventory,
+              title: 'Inventory Management',
+              screen: InventoryManagementScreen(),
+            ),
+
+            // Demand Forecast
+            _buildNavigationTile(
+              context,
+              icon: Icons.bar_chart,
+              title: 'Demand Forecast',
+              screen: DemandForecastScreen(),
+            ),
+
+            // Task Management
+            _buildNavigationTile(
+              context,
+              icon: Icons.task,
+              title: 'Task Management',
+              screen: TasksManagement(),
+            ),
+
+
+            // History
+            _buildNavigationTile(
+              context,
+              icon: Icons.history,
+              title: 'History',
+              screen: HistoryScreen(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavigationTile(
+      BuildContext context, {
+        required IconData icon,
+        required String title,
+        required Widget screen,
+      }) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (context) => screen));
+      },
+      child: Card(
+        elevation: 4,
+        color: const Color(0xFF123D59), // Dark tile background
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0), // Rounded corners
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 40, color: Colors.white),
             const SizedBox(height: 10),
             Text(
               title,
+              textAlign: TextAlign.center,
               style: const TextStyle(
-                fontSize: 14,
                 color: Colors.white,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDemandForecastSection() {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const DemandForecastScreen()),
-        );
-      },
-      child: Card(
-        color: const Color(0xFF123D59), // Blue-teal background for forecast
-        elevation: 4,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Demand Forecast',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white, // White text
-                ),
-              ),
-              const SizedBox(height: 10),
-              Container(
-                height: 200,
-                color: Colors.grey[200],
-                child: const Center(
-                  child: Text(
-                    'Placeholder for Demand Forecast Graph',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInventoryTable() {
-    return Card(
-      color: const Color(0xFF123D59), // Blue-teal background for inventory
-      elevation: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Real-Time Inventory',
-              style: TextStyle(
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Colors.white, // White text
-              ),
-            ),
-            const SizedBox(height: 10),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: DataTable(
-                columns: const [
-                  DataColumn(label: Text('Item Name', style: TextStyle(color: Colors.white))),
-                  DataColumn(label: Text('Current Stock', style: TextStyle(color: Colors.white))),
-                  DataColumn(label: Text('Reorder Threshold', style: TextStyle(color: Colors.white))),
-                  DataColumn(label: Text('Status', style: TextStyle(color: Colors.white))),
-                ],
-                rows: [
-                  _buildInventoryTableRow('Widget A', '250', '100', Colors.green),
-                  _buildInventoryTableRow('Widget B', '75', '200', Colors.red),
-                  _buildInventoryTableRow('Widget C', '500', '300', Colors.blue),
-                  _buildInventoryTableRow('Widget D', '150', '250', Colors.orange),
-                ],
               ),
             ),
           ],
         ),
       ),
-    );
-  }
-
-  DataRow _buildInventoryTableRow(
-      String itemName, String currentStock, String reorderThreshold, Color statusColor) {
-    return DataRow(
-      cells: [
-        DataCell(Text(itemName, style: const TextStyle(color: Colors.white))),
-        DataCell(Text(currentStock, style: const TextStyle(color: Colors.white))),
-        DataCell(Text(reorderThreshold, style: const TextStyle(color: Colors.white))),
-        DataCell(
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: statusColor.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              _getStockStatus(currentStock, reorderThreshold),
-              style: TextStyle(color: statusColor, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  String _getStockStatus(String currentStock, String reorderThreshold) {
-    int current = int.parse(currentStock);
-    int threshold = int.parse(reorderThreshold);
-
-    if (current < threshold * 0.5) return 'Low';
-    if (current < threshold) return 'Warning';
-    return 'Optimal';
-  }
-
-  Widget _buildAlertsSection() {
-    return Card(
-      color: const Color(0xFF123D59), // Blue-teal background for alerts
-      elevation: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Alerts',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.white, // White text for Alerts
-              ),
-            ),
-            const SizedBox(height: 10),
-            SingleChildScrollView(
-              child: Column(
-                children: [
-                  _buildAlertItem(
-                    'Low Stock Alert: Widget B',
-                    'Current stock (75) is below reorder threshold (200)',
-                    Icons.warning,
-                    Colors.red,
-                  ),
-                  _buildAlertItem(
-                    'Incoming Shipment',
-                    'Shipment of 500 units of Widget C expected tomorrow',
-                    Icons.local_shipping,
-                    Colors.blue,
-                  ),
-                  _buildAlertItem(
-                    'Overstock Warning',
-                    'Widget D inventory exceeding optimal levels',
-                    Icons.info,
-                    Colors.orange,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAlertItem(String title, String subtitle, IconData icon, Color color) {
-    return ListTile(
-      leading: Icon(icon, color: color),
-      title: Text(
-        title,
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          color: color,
-        ),
-      ),
-      subtitle: Text(subtitle, style: const TextStyle(color: Colors.white)),
     );
   }
 }
