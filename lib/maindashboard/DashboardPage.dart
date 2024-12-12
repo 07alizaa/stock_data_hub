@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../ProductManagement/AddNewProduct.dart';
 
 import 'SettingPage.dart';
-import 'WinventoryManagement.dart';
+import 'package:stock_data_hub/WareHousePages/WinventoryManagement.dart';
 
 
 class DashboardPage extends StatelessWidget {
