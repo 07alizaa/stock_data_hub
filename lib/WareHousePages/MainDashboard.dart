@@ -71,7 +71,7 @@ class _MainDashboardState extends State<MainDashboard> {
               context,
               icon: Icons.task,
               title: 'Task Management',
-              screen: TasksManagement(),
+              screen: TaskManagementScreen(),
             ),
 
 
