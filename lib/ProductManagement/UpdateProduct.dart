@@ -62,17 +62,33 @@ class _UpdateProductState extends State<UpdateProduct> {
       'price': double.tryParse(priceController.text.trim()) ?? 0.0,
       'lowStockThreshold': int.tryParse(lowStockController.text.trim()) ?? 0,
       'demandForecast': demandForecastController.text.trim(),
-
-      // Optionally recalculate 'status'
-      // 'status': int.tryParse(quantityController.text.trim()) ?? 0 <=
-      //     int.tryParse(lowStockController.text.trim()) ?? 0
-      //     ? 'Low'
-      //     : 'Optimal',
     };
 
     try {
-      // Update the product in Firestore using the product ID
-      await _firestore.collection('products').doc(widget.product['id']).update(updatedProduct);
+      // Get the reference to the product document
+      DocumentReference productRef = _firestore.collection('products').doc(widget.product['id']);
+
+      // Retrieve the current product data
+      DocumentSnapshot productSnapshot = await productRef.get();
+      Map<String, dynamic> currentData = productSnapshot.data() as Map<String, dynamic>;
+
+      // Log changes to the product's history sub-collection
+      updatedProduct.forEach((key, newValue) {
+        if (currentData[key] != newValue) {
+          productRef.collection('history').add({
+            'action': 'updated',
+            'timestamp': FieldValue.serverTimestamp(),
+            'details': {
+              'field': key,
+              'previousValue': currentData[key],
+              'newValue': newValue,
+            },
+          });
+        }
+      });
+
+      // Update the product in Firestore
+      await productRef.update(updatedProduct);
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Product updated successfully')),
@@ -86,6 +102,7 @@ class _UpdateProductState extends State<UpdateProduct> {
       );
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

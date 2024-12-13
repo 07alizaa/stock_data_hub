@@ -76,7 +76,8 @@ class _AddNewProductState extends State<AddNewProduct> {
                   "Low Stock Threshold",
                   "Enter low stock threshold",
                       (value) => lowStockThreshold = int.parse(value!),
-                  validator: (value) => value!.isEmpty
+                  validator: (value) =>
+                  value!.isEmpty
                       ? "Please enter low stock threshold"
                       : null,
                   isNumeric: true,
@@ -112,8 +113,7 @@ class _AddNewProductState extends State<AddNewProduct> {
     );
   }
 
-  Widget _buildTextField(
-      String labelText,
+  Widget _buildTextField(String labelText,
       String hintText,
       Function(String?) onSaved, {
         required String? Function(String?) validator,
@@ -138,7 +138,9 @@ class _AddNewProductState extends State<AddNewProduct> {
       _formKey.currentState!.save();
 
       try {
-        await _firestore.collection('products').add({
+        // Add product to the 'products' collection
+        DocumentReference productRef = await _firestore.collection('products')
+            .add({
           'name': productName,
           'quantity': productQuantity,
           'description': productDescription,
@@ -148,6 +150,19 @@ class _AddNewProductState extends State<AddNewProduct> {
           'status': productQuantity <= lowStockThreshold ? 'Low' : 'Optimal',
         });
 
+        // Log the action to the product's 'history' sub-collection
+        await productRef.collection('history').add({
+          'action': 'added',
+          'timestamp': FieldValue.serverTimestamp(),
+          'details': {
+            'name': productName,
+            'quantity': productQuantity,
+            'description': productDescription,
+            'price': productPrice,
+          },
+        });
+
+        // Show success message and navigate back
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Product added successfully!')),
         );
@@ -156,7 +171,7 @@ class _AddNewProductState extends State<AddNewProduct> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: $e')),
         );
+      }
     }
-    }
-    }
+  }
 }

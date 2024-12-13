@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class DispatchFormScreen extends StatefulWidget {
   final Map<String, dynamic>? product; // Optional: For dispatching a specific product
@@ -22,6 +23,7 @@ class _DispatchFormScreenState extends State<DispatchFormScreen>
   String supplierName = '';
   DateTime? dispatchDate;
   String priority = 'Normal Priority';
+  LatLng? deliveryLocation; // To store selected delivery location
 
   // Filter for Dispatch Records
   String selectedStatus = 'All';
@@ -147,6 +149,25 @@ class _DispatchFormScreenState extends State<DispatchFormScreen>
                   priority = value!;
                 });
               },
+            ),
+            const SizedBox(height: 10),
+
+            // Location Picker
+            ListTile(
+              title: const Text("Select Delivery Location"),
+              subtitle: Text(
+                deliveryLocation != null
+                    ? "Lat: ${deliveryLocation!.latitude}, Lng: ${deliveryLocation!.longitude}"
+                    : "No location selected",
+              ),
+              trailing: IconButton(
+                icon: const Icon(Icons.location_on),
+                onPressed: () async {
+                  setState(() {
+                    deliveryLocation = LatLng(27.7172, 85.3240); // Example location
+                  });
+                },
+              ),
             ),
             const SizedBox(height: 20),
 
@@ -300,6 +321,13 @@ class _DispatchFormScreenState extends State<DispatchFormScreen>
         return;
       }
 
+      if (deliveryLocation == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please select a delivery location')),
+        );
+        return;
+      }
+
       if (widget.product != null &&
           dispatchedQuantity > widget.product!['quantity']) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -314,7 +342,11 @@ class _DispatchFormScreenState extends State<DispatchFormScreen>
         'supplier': supplierName,
         'date': dispatchDate!.toLocal().toString().split(' ')[0],
         'priority': priority,
-        'status': 'Pending',
+        'status': 'In Transit',
+        'deliveryLocation': {
+          'lat': deliveryLocation!.latitude,
+          'lng': deliveryLocation!.longitude,
+        },
       });
 
       if (widget.product != null) {
@@ -333,6 +365,7 @@ class _DispatchFormScreenState extends State<DispatchFormScreen>
         supplierName = '';
         dispatchDate = null;
         priority = 'Normal Priority';
+        deliveryLocation = null;
       });
     }
   }

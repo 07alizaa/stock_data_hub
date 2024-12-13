@@ -4,6 +4,7 @@ import 'package:stock_data_hub/DashboardOverview/DashboardOverviewScreen.dart';
 import '../ProductManagement/AddNewProduct.dart';
 
 import '../WareHousePages/TaskManagementScreen.dart';
+import 'AdminHistory.dart';
 import 'SettingPage.dart';
 import 'package:stock_data_hub/WareHousePages/WinventoryManagement.dart';
 
@@ -73,9 +74,15 @@ class DashboardPage extends StatelessWidget {
                     label: "History",
                     icon: Icons.history,
                     onTap: () {
-                      // Add navigation logic for History
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AdminProductHistoryScreen(),
+                        ),
+                      );
                     },
                   ),
+
                   _buildDashboardCard(
                     context,
                     label: "Settings",
