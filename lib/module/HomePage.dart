@@ -50,17 +50,25 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(height: 20),
-                const Text(
-                  'STOCK DATA HUB',
-                  style: TextStyle(
-                    color: Colors.orange,
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
+                Container(
+                  // decoration: BoxDecoration(
+                  //   shape: BoxShape.circle,
+                  //   border: Border.all(color: Colors.orange, width: 2),
+                  // ),
+                  padding: const EdgeInsets.all(20),
+                  child: const Text(
+                    '"WELCOME TO STOCK DATA HUB"',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.orange,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'Optimizing Inventory, Maximizing Sales',
+                  'Optimizing Inventory & Maximizing Sales',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,
@@ -70,11 +78,22 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 const SizedBox(height: 40),
                 ScaleTransition(
                   scale: _imageAnimation,
-                  child: SizedBox(
-                    height: 200,
-                    child: Image.asset(
-                      'assets/logo.png', // Add your illustration here
-                      fit: BoxFit.contain,
+                  child: ClipOval(
+                    child: SizedBox(
+                      height: 150,
+                      width: 150,
+                      child: Image.asset(
+                        'assets/logo.png',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          color: Colors.grey,
+                          child: const Icon(
+                            Icons.image,
+                            color: Colors.white,
+                            size: 50,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -99,7 +118,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Get Started',
+                          'Go to Login Page',
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -109,22 +128,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                         SizedBox(width: 8), // Add space between text and icon
                         Icon(Icons.arrow_forward, color: Colors.white),
                       ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const LoginPage()),
-                    );
-                  },
-                  child: const Text(
-                    'Go to login page',
-                    style: TextStyle(
-                      color: Colors.orange,
-                      fontSize: 16,
                     ),
                   ),
                 ),
