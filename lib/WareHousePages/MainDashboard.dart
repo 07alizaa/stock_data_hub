@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 // Import other pages
 import 'package:stock_data_hub/DashboardOverview/DashboardOverviewScreen.dart';
 import 'AlertsNotificationScreen.dart';
+import 'WReports.dart';
 
 import 'TaskManagementScreen.dart';
 import 'DemandForecastScreen.dart';
@@ -72,6 +73,13 @@ class _MainDashboardState extends State<MainDashboard> {
               icon: Icons.task,
               title: 'Task Management',
               screen: TaskManagementScreen(),
+            ),
+
+            _buildNavigationTile(
+              context,
+              icon: Icons.task,
+              title: 'Reports',
+              screen: ReportPage(),
             ),
 
 
