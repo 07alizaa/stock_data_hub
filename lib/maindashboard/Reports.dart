@@ -1,48 +1,77 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'DashboardPage.dart'; // Import Dashboard Page
-
-class ReportsPage extends StatefulWidget {
-  const ReportsPage({super.key});
+class InventoryReportsPage extends StatefulWidget {
+  const InventoryReportsPage({Key? key}) : super(key: key);
 
   @override
-  State<ReportsPage> createState() => _ReportsPageState();
+  State<InventoryReportsPage> createState() => _InventoryReportsPageState();
 }
 
-class _ReportsPageState extends State<ReportsPage> {
+class _InventoryReportsPageState extends State<InventoryReportsPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Map<String, dynamic> todaySale = {
-    "amount": "Rs0.0",
-    "highestSale": "Rs0.0",
-    "highlight": "No data available",
-  };
-
-  Map<String, dynamic> lastWeekSale = {
-    "amount": "Rs0.0",
-    "customers": "0",
-    "highlight": "No data available",
-  };
+  int totalProducts = 0;
+  double totalStockValue = 0.0;
+  int lowStockCount = 0;
+  List<Map<String, dynamic>> lowStockProducts = [];
+  List<Map<String, dynamic>> highDemandProducts = [];
 
   @override
   void initState() {
     super.initState();
-    _fetchReportsData();
+    _fetchInventoryData();
   }
 
-  void _fetchReportsData() async {
+  Future<void> _fetchInventoryData() async {
     try {
-      final todayData = await _firestore.collection('sales').doc('today').get();
-      final lastWeekData =
-      await _firestore.collection('sales').doc('lastWeek').get();
+      final productsSnapshot = await _firestore.collection('products').get();
+
+      int productCount = 0;
+      double stockValue = 0.0;
+      int lowStock = 0;
+      List<Map<String, dynamic>> lowStockList = [];
+      List<Map<String, dynamic>> highDemandList = [];
+
+      for (var doc in productsSnapshot.docs) {
+        final product = doc.data();
+        productCount++;
+
+        int quantity = product['quantity'] ?? 0;
+        double price = product['price'] ?? 0.0;
+        int lowStockThreshold = product['lowStockThreshold'] ?? 0;
+        String demandForecast = product['demandForecast'] ?? "Unknown";
+
+        stockValue += quantity * price;
+
+        if (quantity <= lowStockThreshold) {
+          lowStock++;
+          lowStockList.add({
+            'name': product['name'],
+            'quantity': quantity,
+            'threshold': lowStockThreshold,
+            'suggestedReorder': lowStockThreshold - quantity + 10,
+          });
+        }
+
+        if (demandForecast == "High" && quantity <= lowStockThreshold) {
+          highDemandList.add({
+            'name': product['name'],
+            'quantity': quantity,
+            'demandForecast': demandForecast,
+          });
+        }
+      }
 
       setState(() {
-        todaySale = todayData.data() ?? todaySale;
-        lastWeekSale = lastWeekData.data() ?? lastWeekSale;
+        totalProducts = productCount;
+        totalStockValue = stockValue;
+        lowStockCount = lowStock;
+        lowStockProducts = lowStockList;
+        highDemandProducts = highDemandList;
       });
     } catch (e) {
-      print("Error fetching sales data: $e");
+      print("Error fetching inventory data: $e");
     }
   }
 
@@ -50,117 +79,41 @@ class _ReportsPageState extends State<ReportsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Reports'),
+        title: const Text('Inventory Reports'),
         backgroundColor: const Color(0xFF123D59),
         centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: ListView(
           children: [
-            ElevatedButton(
-              onPressed: () {
-                _showSalesReportDialog();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF123D59),
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-              ),
-              child: const Text('Sales Report'),
-            ),
+            _buildOverviewCard(),
             const SizedBox(height: 16.0),
-
-            // Today's Sales Report Card
-            _buildReportCard(
-              title: "TODAY'S SALE",
-              amount: todaySale["amount"],
-              details: todaySale["highestSale"],
-              highlight: todaySale["highlight"],
-            ),
+            if (lowStockProducts.isNotEmpty) ...[
+              const Text(
+                "Low Stock Alerts",
+                style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8.0),
+              _buildLowStockList(),
+            ],
             const SizedBox(height: 16.0),
-
-            // Last Week Sales Report Card
-            _buildReportCard(
-              title: "LAST WEEK SALE",
-              amount: lastWeekSale["amount"],
-              details:
-              "Approx ${lastWeekSale["customers"]} customers arrived",
-              highlight: lastWeekSale["highlight"],
-            ),
-            const Spacer(),
-
-            // Generate Custom Report Button
-            ElevatedButton(
-              onPressed: _generateCustomReport,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFF9900),
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
+            if (highDemandProducts.isNotEmpty) ...[
+              const Text(
+                "High Demand Products (Low Stock)",
+                style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
               ),
-              child: const Center(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 14.0),
-                  child: Text(
-                    'Generate Custom Report',
-                    style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-            ),
+              const SizedBox(height: 8.0),
+              _buildHighDemandList(),
+            ],
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: const Color(0xFF123D59),
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.grey,
-        onTap: (index) {
-          if (index == 1) {
-            // Navigate to Inventory Management Page
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const DashboardPage()),
-            );
-          } else if (index == 2) {
-            // Navigate to Dashboard Page
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const DashboardPage()),
-            );
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.inventory),
-            label: 'Inventory',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard),
-            label: 'Dashboard',
-          ),
-        ],
       ),
     );
   }
 
-  Widget _buildReportCard({
-    required String title,
-    required String amount,
-    required String details,
-    required String highlight,
-  }) {
+  Widget _buildOverviewCard() {
     return Container(
-      width: double.infinity,
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         color: const Color(0xFF123D59),
@@ -169,79 +122,62 @@ class _ReportsPageState extends State<ReportsPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: const TextStyle(
+          const Text(
+            "Overview",
+            style: TextStyle(
               color: Colors.white70,
-              fontSize: 14.0,
+              fontSize: 18.0,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 8.0),
           Text(
-            amount,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 24.0,
-              fontWeight: FontWeight.bold,
-            ),
+            "Total Products: $totalProducts",
+            style: const TextStyle(color: Colors.white, fontSize: 16.0),
           ),
-          const SizedBox(height: 8.0),
+          const SizedBox(height: 4.0),
           Text(
-            details,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 14.0,
-            ),
+            "Total Stock Value: Rs. ${totalStockValue.toStringAsFixed(2)}",
+            style: const TextStyle(color: Colors.white, fontSize: 16.0),
           ),
-          const SizedBox(height: 8.0),
+          const SizedBox(height: 4.0),
           Text(
-            highlight,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 14.0,
-            ),
+            "Low Stock Products: $lowStockCount",
+            style: const TextStyle(color: Colors.white, fontSize: 16.0),
           ),
         ],
       ),
     );
   }
 
-  void _showSalesReportDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Sales Report'),
-          content: const Text(
-            'Detailed sales report is generated from Firebase dynamically.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Close'),
+  Widget _buildLowStockList() {
+    return Column(
+      children: lowStockProducts.map((product) {
+        return Card(
+          child: ListTile(
+            title: Text(product['name']),
+            subtitle: Text(
+              "Quantity: ${product['quantity']}, Threshold: ${product['threshold']}",
             ),
-          ],
+            trailing: Text("Reorder: ${product['suggestedReorder']}"),
+          ),
         );
-      },
+      }).toList(),
     );
   }
 
-  void _generateCustomReport() async {
-    try {
-      await _firestore.collection('customReports').add({
-        'generatedAt': FieldValue.serverTimestamp(),
-        'details': 'Custom sales report generated successfully!',
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Custom Report Generated!")),
-      );
-    } catch (e) {
-      print("Error generating custom report: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Failed to generate custom report")),
-      );
-    }
+  Widget _buildHighDemandList() {
+    return Column(
+      children: highDemandProducts.map((product) {
+        return Card(
+          child: ListTile(
+            title: Text(product['name']),
+            subtitle: Text(
+              "Demand Forecast: ${product['demandForecast']}, Quantity: ${product['quantity']}",
+            ),
+          ),
+        );
+      }).toList(),
+    );
   }
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:stock_data_hub/DashboardOverview/DashboardOverviewScreen.dart';
 
 import '../ProductManagement/AddNewProduct.dart';
-
+import 'Reports.dart';
 import '../WareHousePages/TaskManagementScreen.dart';
 import 'AdminHistory.dart';
 import 'SettingPage.dart';
@@ -66,7 +66,12 @@ class DashboardPage extends StatelessWidget {
                     label: "Reports",
                     icon: Icons.bar_chart,
                     onTap: () {
-                      // Add navigation logic for Reports
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const InventoryReportsPage(),
+                        ),
+                      );
                     },
                   ),
                   _buildDashboardCard(

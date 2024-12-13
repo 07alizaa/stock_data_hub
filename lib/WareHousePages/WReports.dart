@@ -32,6 +32,8 @@ class _ReportPageState extends State<ReportPage> {
               ),
             ),
             const SizedBox(height: 20),
+            _buildOverview(),
+            const SizedBox(height: 20),
             _buildStockLevelsChart(),
             const SizedBox(height: 20),
             _buildDispatchStatusChart(),
@@ -40,6 +42,43 @@ class _ReportPageState extends State<ReportPage> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildOverview() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: _firestore.collection('products').snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return _buildReportCard(
+            title: 'Inventory Overview',
+            content: const Text('No inventory data available.'),
+          );
+        }
+
+        final products = snapshot.data!.docs;
+        int totalProducts = products.length;
+        double totalValue = products.fold(
+          0.0,
+              (total, doc) =>
+          total + (doc['quantity'] ?? 0) * (doc['price'] ?? 0.0),
+        );
+
+        return _buildReportCard(
+          title: 'Inventory Overview',
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Total Products: $totalProducts'),
+              Text('Total Stock Value: Rs. ${totalValue.toStringAsFixed(2)}'),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -103,7 +142,25 @@ class _ReportPageState extends State<ReportPage> {
                   ),
                 ),
                 borderData: FlBorderData(show: true),
-                barTouchData: BarTouchData(enabled: true),
+                barTouchData: BarTouchData(
+                  touchTooltipData: BarTouchTooltipData(
+                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                      return BarTooltipItem(
+                        '${products[groupIndex]['name']}\n',
+                        const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: '${rod.toY.toInt()} items',
+                            style: const TextStyle(color: Colors.yellow),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
               ),
             ),
           ),
