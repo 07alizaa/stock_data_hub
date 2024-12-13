@@ -56,19 +56,7 @@ class DashboardPage extends StatelessWidget {
                     },
                   ),
 
-                  _buildDashboardCard(
-                    context,
-                    label: "TaskManagement",
-                    icon: Icons.inventory,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>  TasksManagement(),
-                        ),
-                      );
-                    },
-                  ),
+
 
 
 

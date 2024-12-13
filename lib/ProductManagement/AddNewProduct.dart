@@ -99,7 +99,7 @@ class _AddNewProductState extends State<AddNewProduct> {
             _buildTextField(
               "Product Name",
               "Enter product name",
-                  (value) => productName = value!,
+                  (value) => productName = value!.trim(),
               validator: (value) => value!.isEmpty ? "Please enter product name" : null,
             ),
             SizedBox(height: size.height * 0.015),
@@ -216,6 +216,13 @@ class _AddNewProductState extends State<AddNewProduct> {
   Future<void> _saveProduct() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
+
+      if (productName.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Product name cannot be empty')),
+        );
+        return;
+      }
 
       try {
         await _firestore.collection('products').add({
