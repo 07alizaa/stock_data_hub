@@ -1,14 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:stock_data_hub/dashboard/suppliers.dart';
 import 'package:stock_data_hub/maindashboard/DashboardPage.dart';
 import '../WareHousePages/MainDashboard.dart';
 import '../forgetpassword/ForgotPassword.dart';
-
 import 'SignUpPage.dart';
-// import 'MainDashboard.dart';
 
+/// Login Page for the Stock Data Hub Application
+/// This page allows users to log in using their email and password
+/// and navigates them to the appropriate dashboard based on their role.
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -17,9 +17,14 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  // Controllers to handle email and password input
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
+  // Toggles for hiding/showing the password
   bool isHidePassword = true;
+
+  // Firebase authentication and Firestore instances
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -38,6 +43,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: IntrinsicHeight(
                   child: Column(
                     children: [
+                      // App Logo Section
                       SizedBox(height: MediaQuery.of(context).size.height * 0.05),
                       CircleAvatar(
                         radius: MediaQuery.of(context).size.width * 0.15,
@@ -47,7 +53,10 @@ class _LoginPageState extends State<LoginPage> {
                           child: Image.asset('assets/logo.png', fit: BoxFit.contain),
                         ),
                       ),
+
                       const SizedBox(height: 10),
+
+                      // App Title Section
                       const Text(
                         "STOCK DATA HUB",
                         style: TextStyle(
@@ -57,7 +66,10 @@ class _LoginPageState extends State<LoginPage> {
                           letterSpacing: 1.5,
                         ),
                       ),
+
                       SizedBox(height: MediaQuery.of(context).size.height * 0.04),
+
+                      // Login Form Section
                       Expanded(
                         child: Container(
                           width: double.infinity,
@@ -69,6 +81,7 @@ class _LoginPageState extends State<LoginPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              // Login Header
                               const Text(
                                 "Login",
                                 style: TextStyle(
@@ -82,7 +95,10 @@ class _LoginPageState extends State<LoginPage> {
                                 "Login to continue using the app",
                                 style: TextStyle(color: Colors.white70, fontSize: 16),
                               ),
+
                               const SizedBox(height: 25),
+
+                              // Email Input Field
                               TextField(
                                 controller: emailController,
                                 decoration: InputDecoration(
@@ -100,7 +116,10 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                 ),
                               ),
+
                               const SizedBox(height: 20),
+
+                              // Password Input Field
                               TextField(
                                 controller: passwordController,
                                 obscureText: isHidePassword,
@@ -123,6 +142,8 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                 ),
                               ),
+
+                              // Forgot Password Section
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: TextButton(
@@ -140,10 +161,13 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                 ),
                               ),
+
                               const SizedBox(height: 25),
+
+                              // Login Button
                               Center(
                                 child: ElevatedButton(
-                                  onPressed: _login,
+                                  onPressed: _login, // Calls the login function
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFFFFA726),
                                     padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 60.0),
@@ -161,10 +185,14 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                 ),
                               ),
+
                               const SizedBox(height: 30),
+
+                              // Alternative Login Methods
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
+                                  // Facebook Login Button
                                   Container(
                                     width: 50,
                                     height: 50,
@@ -178,7 +206,10 @@ class _LoginPageState extends State<LoginPage> {
                                       onPressed: _loginWithFacebook,
                                     ),
                                   ),
+
                                   const SizedBox(width: 20),
+
+                                  // Google Login Button
                                   Container(
                                     width: 50,
                                     height: 50,
@@ -194,7 +225,10 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                 ],
                               ),
+
                               const SizedBox(height: 30),
+
+                              // Sign Up Section
                               Center(
                                 child: TextButton(
                                   onPressed: () {
@@ -226,6 +260,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  /// Function to handle user login
   Future<void> _login() async {
     // Show loading indicator
     showDialog(
@@ -237,80 +272,67 @@ class _LoginPageState extends State<LoginPage> {
     );
 
     try {
-      // Sign in the user with email and password
+      // Authenticate user using email and password
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
 
-      // Get the user ID
+      // Fetch the user role from Firestore
       String userId = userCredential.user?.uid ?? '';
-
-      // Fetch user role from Firestore
       DocumentSnapshot userDoc = await _firestore.collection('users').doc(userId).get();
 
-      // Close loading indicator
+      // Close the loading indicator
       Navigator.of(context).pop();
 
+      // Navigate to the appropriate dashboard
       if (userDoc.exists) {
         String? role = userDoc['role'];
 
-        // Navigate to the respective dashboard based on the role
         if (role == 'Admin') {
           Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (context) => const DashboardPage()), // Admin dashboard
+            MaterialPageRoute(builder: (context) => const DashboardPage()),
                 (route) => false,
           );
         } else if (role == 'WareHouse') {
           Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (context) =>  MainDashboard()), // Warehouse dashboard
-                (route) => false,
-          );
-        } else if (role == 'Suppliers') {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const SuppliersPage()), // Supplier dashboard
+            MaterialPageRoute(builder: (context) => MainDashboard()),
                 (route) => false,
           );
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Role not recognized. Please contact support.')),
-          );
+          _showErrorSnackbar('Role not recognized. Please contact support.');
         }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('User data not found. Please contact support.')),
-        );
+        _showErrorSnackbar('User data not found. Please contact support.');
       }
     } catch (e) {
-      // Close loading indicator
+      // Close the loading indicator and show the error
       Navigator.of(context).pop();
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}')),
-      );
+      _showErrorSnackbar('Error: ${e.toString()}');
     }
   }
 
-
-
+  /// Toggles password visibility
   void _togglePasswordView() {
     setState(() {
       isHidePassword = !isHidePassword;
     });
   }
 
+  /// Placeholder for Google login
   void _loginWithGoogle() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Google login not implemented yet.')),
-    );
+    _showErrorSnackbar('Google login not implemented yet.');
   }
 
+  /// Placeholder for Facebook login
   void _loginWithFacebook() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Facebook login not implemented yet.')),
-    );
+    _showErrorSnackbar('Facebook login not implemented yet.');
+  }
+
+  /// Utility function to show error messages
+  void _showErrorSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 }
