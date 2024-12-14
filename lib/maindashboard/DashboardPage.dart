@@ -30,19 +30,19 @@ class DashboardPage extends StatelessWidget {
                 crossAxisSpacing: 16.0,
                 mainAxisSpacing: 16.0,
                 children: [
-                  _buildDashboardCard(
-                    context,
-                    label: "Dashboard Overview",
-                    icon: Icons.inventory,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const Dashboardscreen(),
-                        ),
-                      );
-                    },
-                  ),
+                  // _buildDashboardCard(
+                  //   context,
+                  //   label: "Dashboard Overview",
+                  //   icon: Icons.inventory,
+                  //   onTap: () {
+                  //     Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(
+                  //         builder: (context) => const DashboardOverviewScreen(),
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
                   _buildDashboardCard(
                     context,
                     label: "Inventory Management",

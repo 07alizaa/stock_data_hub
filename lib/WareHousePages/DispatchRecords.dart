@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart' as google_maps;
+import 'DispatchTracking.dart'; // Import the DispatchTracking screen
 
 class DispatchFormScreen extends StatefulWidget {
-  final Map<String, dynamic>? product; // Optional: For dispatching a specific product
+  final Map<String, dynamic>? product;
 
   const DispatchFormScreen({Key? key, this.product}) : super(key: key);
 
@@ -18,14 +19,12 @@ class _DispatchFormScreenState extends State<DispatchFormScreen>
 
   TabController? _tabController;
 
-  // Dispatch Form Fields
   int dispatchedQuantity = 0;
   String supplierName = '';
   DateTime? dispatchDate;
   String priority = 'Normal Priority';
-  LatLng? deliveryLocation; // To store selected delivery location
+  google_maps.LatLng? deliveryLocation;
 
-  // Filter for Dispatch Records
   String selectedStatus = 'All';
 
   @override
@@ -57,14 +56,13 @@ class _DispatchFormScreenState extends State<DispatchFormScreen>
       body: TabBarView(
         controller: _tabController,
         children: [
-          _buildDispatchForm(), // Dispatch Form Tab
-          _buildDispatchRecords(), // Dispatch Records Tab
+          _buildDispatchForm(),
+          _buildDispatchRecords(),
         ],
       ),
     );
   }
 
-  // Dispatch Form UI
   Widget _buildDispatchForm() {
     return Container(
       color: const Color(0xFFF5E8D8),
@@ -80,8 +78,6 @@ class _DispatchFormScreenState extends State<DispatchFormScreen>
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
-
-            // Dispatched Quantity
             _buildTextField(
               'Dispatched Quantity',
               'Enter quantity to dispatch',
@@ -89,8 +85,6 @@ class _DispatchFormScreenState extends State<DispatchFormScreen>
               TextInputType.number,
             ),
             const SizedBox(height: 10),
-
-            // Supplier Name
             _buildTextField(
               'Supplier Name',
               'Enter supplier name',
@@ -98,8 +92,6 @@ class _DispatchFormScreenState extends State<DispatchFormScreen>
               TextInputType.text,
             ),
             const SizedBox(height: 10),
-
-            // Dispatch Date Picker
             InkWell(
               onTap: () async {
                 final selectedDate = await showDatePicker(
@@ -128,8 +120,6 @@ class _DispatchFormScreenState extends State<DispatchFormScreen>
               ),
             ),
             const SizedBox(height: 10),
-
-            // Priority Dropdown
             DropdownButtonFormField<String>(
               value: priority,
               decoration: const InputDecoration(
@@ -151,8 +141,6 @@ class _DispatchFormScreenState extends State<DispatchFormScreen>
               },
             ),
             const SizedBox(height: 10),
-
-            // Location Picker
             ListTile(
               title: const Text("Select Delivery Location"),
               subtitle: Text(
@@ -164,14 +152,12 @@ class _DispatchFormScreenState extends State<DispatchFormScreen>
                 icon: const Icon(Icons.location_on),
                 onPressed: () async {
                   setState(() {
-                    deliveryLocation = LatLng(27.7172, 85.3240); // Example location
+                    deliveryLocation = google_maps.LatLng(27.7172, 85.3240);
                   });
                 },
               ),
             ),
             const SizedBox(height: 20),
-
-            // Save Button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -195,89 +181,82 @@ class _DispatchFormScreenState extends State<DispatchFormScreen>
     );
   }
 
-  // Dispatch Records UI
   Widget _buildDispatchRecords() {
     return Container(
       color: const Color(0xFFF5E8D8),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: DropdownButton<String>(
-              value: selectedStatus,
-              isExpanded: true,
-              items: ['All', 'Pending', 'Completed']
-                  .map((status) => DropdownMenuItem(
-                value: status,
-                child: Text(status),
-              ))
-                  .toList(),
-              onChanged: (value) {
-                setState(() {
-                  selectedStatus = value!;
-                });
-              },
-            ),
-          ),
-          Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream: _getDispatchRecordsStream(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+      child: StreamBuilder<QuerySnapshot>(
+        stream: _getDispatchRecordsStream(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return const Center(
-                    child: Text(
-                      'No dispatch records found.',
-                      style: TextStyle(fontSize: 16, color: Colors.black),
-                    ),
-                  );
-                }
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(
+              child: Text(
+                'No dispatch records found.',
+                style: TextStyle(fontSize: 16, color: Colors.black),
+              ),
+            );
+          }
 
-                final records = snapshot.data!.docs.map((doc) {
-                  return {
-                    'id': doc.id,
-                    ...doc.data() as Map<String, dynamic>,
-                  };
-                }).toList();
+          final records = snapshot.data!.docs.map((doc) {
+            return {
+              'id': doc.id,
+              ...doc.data() as Map<String, dynamic>,
+            };
+          }).toList();
 
-                return ListView.builder(
-                  itemCount: records.length,
-                  itemBuilder: (context, index) {
-                    final record = records[index];
-                    return Card(
-                      margin: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 16),
-                      child: ListTile(
-                        title: Text(
-                          record['product'],
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.black),
+          return ListView.builder(
+            itemCount: records.length,
+            itemBuilder: (context, index) {
+              final record = records[index];
+              return Card(
+                margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                child: ListTile(
+                  title: Text(
+                    record['product'],
+                    style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                  ),
+                  subtitle: Text(
+                    'Status: ${record['status']}\nQuantity: ${record['quantity']}',
+                    style: const TextStyle(color: Colors.black87),
+                  ),
+                  trailing: _buildTrailingIcon(record),
+                  onTap: () {
+                    if (record['status'] != 'Canceled') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DispatchTrackingPage(dispatchId: record['id']),
                         ),
-                        subtitle: Text(
-                          'Status: ${record['status']}\nQuantity: ${record['quantity']}',
-                          style: const TextStyle(color: Colors.black87),
-                        ),
-                        trailing: Icon(
-                          record['status'] == 'Completed'
-                              ? Icons.check_circle
-                              : Icons.hourglass_top,
-                          color: record['status'] == 'Completed'
-                              ? Colors.green
-                              : Colors.orange,
-                        ),
-                      ),
-                    );
+                      );
+                    }
                   },
-                );
-              },
-            ),
-          ),
-        ],
+                ),
+              );
+            },
+          );
+        },
       ),
     );
+  }
+
+  Widget _buildTrailingIcon(Map<String, dynamic> record) {
+    if (record['status'] == 'Canceled') {
+      return const Text(
+        'Canceled',
+        style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+      );
+    } else {
+      return IconButton(
+        icon: const Icon(Icons.cancel, color: Colors.red),
+        tooltip: 'Cancel Dispatch',
+        onPressed: () {
+          _showCancelConfirmationDialog(record);
+        },
+      );
+    }
   }
 
   Stream<QuerySnapshot> _getDispatchRecordsStream() {
@@ -291,8 +270,64 @@ class _DispatchFormScreenState extends State<DispatchFormScreen>
     }
   }
 
-  Widget _buildTextField(String label, String hintText,
-      Function(String?) onSaved, TextInputType inputType) {
+  void _showCancelConfirmationDialog(Map<String, dynamic> record) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Cancel Dispatch'),
+          content: const Text('Are you sure you want to cancel this dispatch?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('No', style: TextStyle(color: Colors.grey)),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await _cancelDispatch(record);
+              },
+              child: const Text('Yes', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _cancelDispatch(Map<String, dynamic> record) async {
+    try {
+      await _firestore.collection('dispatchRecords').doc(record['id']).update({'status': 'Canceled'});
+
+      final productDoc = await _firestore
+          .collection('products')
+          .where('name', isEqualTo: record['product'])
+          .get();
+
+      if (productDoc.docs.isNotEmpty) {
+        final productId = productDoc.docs.first.id;
+        final currentQuantity = productDoc.docs.first['quantity'] ?? 0;
+        final restoredQuantity = currentQuantity + (record['quantity'] ?? 0);
+
+        await _firestore.collection('products').doc(productId).update({'quantity': restoredQuantity});
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Dispatch canceled successfully!')),
+      );
+
+      setState(() {});
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to cancel dispatch. Please try again later.')),
+      );
+    }
+  }
+
+  Widget _buildTextField(
+      String label, String hintText, Function(String?) onSaved, TextInputType inputType) {
     return TextFormField(
       decoration: InputDecoration(
         labelText: label,
@@ -336,7 +371,7 @@ class _DispatchFormScreenState extends State<DispatchFormScreen>
         return;
       }
 
-      await _firestore.collection('dispatchRecords').add({
+      final dispatchRef = await _firestore.collection('dispatchRecords').add({
         'product': widget.product?['name'] ?? 'Unknown Product',
         'quantity': dispatchedQuantity,
         'supplier': supplierName,
@@ -359,14 +394,12 @@ class _DispatchFormScreenState extends State<DispatchFormScreen>
         const SnackBar(content: Text('Dispatch saved successfully!')),
       );
 
-      // Reset the form
-      setState(() {
-        dispatchedQuantity = 0;
-        supplierName = '';
-        dispatchDate = null;
-        priority = 'Normal Priority';
-        deliveryLocation = null;
-      });
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DispatchTrackingPage(dispatchId: dispatchRef.id),
+        ),
+      );
     }
   }
 }

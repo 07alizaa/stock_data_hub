@@ -40,7 +40,7 @@ class _MainDashboardState extends State<MainDashboard> {
               context,
               icon: Icons.dashboard,
               title: 'Dashboard Overview',
-              screen: Dashboardscreen(),
+              screen: DashboardOverviewScreen(),
             ),
 
             // Alerts
