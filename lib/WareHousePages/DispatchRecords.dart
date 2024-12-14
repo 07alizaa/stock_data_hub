@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as google_maps;
-import 'DispatchTracking.dart'; // Import the DispatchTracking screen
+import 'DispatchTracking.dart';
 
 class DispatchFormScreen extends StatefulWidget {
   final Map<String, dynamic>? product;
@@ -19,12 +19,14 @@ class _DispatchFormScreenState extends State<DispatchFormScreen>
 
   TabController? _tabController;
 
+  // Dispatch Form Fields
   int dispatchedQuantity = 0;
   String supplierName = '';
   DateTime? dispatchDate;
   String priority = 'Normal Priority';
   google_maps.LatLng? deliveryLocation;
 
+  // Filter for Dispatch Records
   String selectedStatus = 'All';
 
   @override
@@ -79,17 +81,17 @@ class _DispatchFormScreenState extends State<DispatchFormScreen>
             ),
             const SizedBox(height: 20),
             _buildTextField(
-              'Dispatched Quantity',
-              'Enter quantity to dispatch',
-                  (value) => dispatchedQuantity = int.tryParse(value!) ?? 0,
-              TextInputType.number,
+              label: 'Dispatched Quantity',
+              hintText: 'Enter quantity to dispatch',
+              onChanged: (value) => dispatchedQuantity = int.tryParse(value!) ?? 0,
+              inputType: TextInputType.number,
             ),
             const SizedBox(height: 10),
             _buildTextField(
-              'Supplier Name',
-              'Enter supplier name',
-                  (value) => supplierName = value!,
-              TextInputType.text,
+              label: 'Supplier Name',
+              hintText: 'Enter supplier name',
+              onChanged: (value) => supplierName = value!,
+              inputType: TextInputType.text,
             ),
             const SizedBox(height: 10),
             InkWell(
@@ -97,7 +99,7 @@ class _DispatchFormScreenState extends State<DispatchFormScreen>
                 final selectedDate = await showDatePicker(
                   context: context,
                   initialDate: DateTime.now(),
-                  firstDate: DateTime(2000),
+                  firstDate: DateTime.now(),
                   lastDate: DateTime(2100),
                 );
                 setState(() {
@@ -201,9 +203,12 @@ class _DispatchFormScreenState extends State<DispatchFormScreen>
           }
 
           final records = snapshot.data!.docs.map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
             return {
               'id': doc.id,
-              ...doc.data() as Map<String, dynamic>,
+              'product': data['product'] ?? 'Unknown Product',
+              'quantity': data['quantity'] ?? 0,
+              'status': data['status'] ?? 'Unknown',
             };
           }).toList();
 
@@ -259,17 +264,6 @@ class _DispatchFormScreenState extends State<DispatchFormScreen>
     }
   }
 
-  Stream<QuerySnapshot> _getDispatchRecordsStream() {
-    if (selectedStatus == 'All') {
-      return _firestore.collection('dispatchRecords').snapshots();
-    } else {
-      return _firestore
-          .collection('dispatchRecords')
-          .where('status', isEqualTo: selectedStatus)
-          .snapshots();
-    }
-  }
-
   void _showCancelConfirmationDialog(Map<String, dynamic> record) {
     showDialog(
       context: context,
@@ -300,7 +294,6 @@ class _DispatchFormScreenState extends State<DispatchFormScreen>
   Future<void> _cancelDispatch(Map<String, dynamic> record) async {
     try {
       await _firestore.collection('dispatchRecords').doc(record['id']).update({'status': 'Canceled'});
-
       final productDoc = await _firestore
           .collection('products')
           .where('name', isEqualTo: record['product'])
@@ -314,11 +307,10 @@ class _DispatchFormScreenState extends State<DispatchFormScreen>
         await _firestore.collection('products').doc(productId).update({'quantity': restoredQuantity});
       }
 
+      setState(() {}); // Refresh the UI
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Dispatch canceled successfully!')),
       );
-
-      setState(() {});
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Failed to cancel dispatch. Please try again later.')),
@@ -326,32 +318,18 @@ class _DispatchFormScreenState extends State<DispatchFormScreen>
     }
   }
 
-  Widget _buildTextField(
-      String label, String hintText, Function(String?) onSaved, TextInputType inputType) {
-    return TextFormField(
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hintText,
-        border: const OutlineInputBorder(),
-        filled: true,
-        fillColor: Colors.white,
-      ),
-      keyboardType: inputType,
-      onChanged: onSaved,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please fill this field';
-        }
-        return null;
-      },
-    );
-  }
-
   void _saveDispatch() async {
     if (_formKey.currentState!.validate()) {
       if (dispatchDate == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Please select a dispatch date')),
+        );
+        return;
+      }
+
+      if (dispatchDate!.isBefore(DateTime.now())) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Dispatch date cannot be in the past')),
         );
         return;
       }
@@ -364,42 +342,84 @@ class _DispatchFormScreenState extends State<DispatchFormScreen>
       }
 
       if (widget.product != null &&
-          dispatchedQuantity > widget.product!['quantity']) {
+          (widget.product!['quantity'] == null || dispatchedQuantity > widget.product!['quantity'])) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Insufficient stock for dispatch')),
         );
         return;
       }
 
-      final dispatchRef = await _firestore.collection('dispatchRecords').add({
-        'product': widget.product?['name'] ?? 'Unknown Product',
-        'quantity': dispatchedQuantity,
-        'supplier': supplierName,
-        'date': dispatchDate!.toLocal().toString().split(' ')[0],
-        'priority': priority,
-        'status': 'In Transit',
-        'deliveryLocation': {
-          'lat': deliveryLocation!.latitude,
-          'lng': deliveryLocation!.longitude,
-        },
-      });
-
-      if (widget.product != null) {
-        await _firestore.collection('products').doc(widget.product!['id']).update({
-          'quantity': widget.product!['quantity'] - dispatchedQuantity,
+      try {
+        final dispatchRef = await _firestore.collection('dispatchRecords').add({
+          'product': widget.product?['name'] ?? 'Unknown Product',
+          'quantity': dispatchedQuantity,
+          'supplier': supplierName,
+          'date': Timestamp.fromDate(dispatchDate!),
+          'priority': priority,
+          'status': 'In Transit',
+          'deliveryLocation': {
+            'lat': deliveryLocation!.latitude,
+            'lng': deliveryLocation!.longitude,
+          },
         });
+
+        if (widget.product != null) {
+          await _firestore.collection('products').doc(widget.product!['id']).update({
+            'quantity': widget.product!['quantity'] - dispatchedQuantity,
+          });
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Dispatch saved successfully!')),
+        );
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DispatchTrackingPage(dispatchId: dispatchRef.id),
+          ),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to save dispatch: $e')),
+        );
       }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Dispatch saved successfully!')),
-      );
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => DispatchTrackingPage(dispatchId: dispatchRef.id),
-        ),
-      );
     }
+  }
+
+  Stream<QuerySnapshot> _getDispatchRecordsStream() {
+    if (selectedStatus == 'All') {
+      return _firestore.collection('dispatchRecords').snapshots();
+    } else {
+      return _firestore
+          .collection('dispatchRecords')
+          .where('status', isEqualTo: selectedStatus)
+          .snapshots();
+    }
+  }
+
+  Widget _buildTextField({
+    required String label,
+    required String hintText,
+    required Function(String?) onChanged,
+    required TextInputType inputType,
+  }) {
+    return TextFormField(
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: hintText,
+        border: const OutlineInputBorder(),
+        filled: true,
+        fillColor: Colors.white,
+      ),
+      keyboardType: inputType,
+      onChanged: onChanged,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please fill this field';
+        }
+        return null;
+      },
+    );
   }
 }

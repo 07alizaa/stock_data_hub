@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fl_chart/fl_chart.dart'; // For rendering charts
+import 'AprioriPage.dart';
 
 class DashboardOverviewScreen extends StatefulWidget {
   const DashboardOverviewScreen({super.key});
@@ -16,6 +17,7 @@ class _DashboardOverviewScreenState extends State<DashboardOverviewScreen> {
   int dispatchedItems = 0; // Total dispatched items
   int pendingTasks = 0; // Number of tasks still pending
   int alerts = 0; // Number of low-stock alerts
+  List<Map<String, dynamic>> recentActivities = []; // Recent activities list
 
   final FirebaseFirestore firestore = FirebaseFirestore.instance; // Firestore instance
 
@@ -23,6 +25,7 @@ class _DashboardOverviewScreenState extends State<DashboardOverviewScreen> {
   void initState() {
     super.initState();
     _listenToDashboardData(); // Start listening to Firestore updates
+    _fetchRecentActivities(); // Fetch recent activities
   }
 
   // Real-time listener for Firestore data
@@ -74,6 +77,49 @@ class _DashboardOverviewScreenState extends State<DashboardOverviewScreen> {
     });
   }
 
+  // Fetch recent activities from Firestore
+  Future<void> _fetchRecentActivities() async {
+    try {
+      final dispatchRecordsSnapshot =
+      await firestore.collection('dispatchRecords').orderBy('date', descending: true).limit(5).get();
+      final productUpdatesSnapshot =
+      await firestore.collection('products').orderBy('updatedAt', descending: true).limit(5).get();
+
+      List<Map<String, dynamic>> activities = [];
+
+      // Process dispatch records
+      for (var doc in dispatchRecordsSnapshot.docs) {
+        final data = doc.data();
+        activities.add({
+          'type': 'Dispatch',
+          'description': 'Dispatched ${data['quantity']} of ${data['product']}',
+          'timestamp': data['date'] ?? 'Unknown Date',
+        });
+      }
+
+      // Process product updates
+      for (var doc in productUpdatesSnapshot.docs) {
+        final data = doc.data();
+        activities.add({
+          'type': 'Product Update',
+          'description': 'Updated product ${data['name']}',
+          'timestamp': data['updatedAt'] ?? 'Unknown Date',
+        });
+      }
+
+      // Sort activities by timestamp
+      activities.sort((a, b) => (b['timestamp'] as Timestamp)
+          .compareTo(a['timestamp'] as Timestamp));
+
+      setState(() {
+        recentActivities = activities;
+      });
+    } catch (e) {
+      // Handle error
+      print("Error fetching recent activities: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -99,6 +145,8 @@ class _DashboardOverviewScreenState extends State<DashboardOverviewScreen> {
               _buildPerformanceOverview(), // Performance bar chart
               const SizedBox(height: 20),
               _buildRecentActivities(), // Recent activities
+              const SizedBox(height: 20),
+              _buildAprioriInsightsButton(), // Button for Apriori Insights
             ],
           ),
         ),
@@ -306,13 +354,6 @@ class _DashboardOverviewScreenState extends State<DashboardOverviewScreen> {
 
   // Recent activities section
   Widget _buildRecentActivities() {
-    final activities = [
-      "Dispatched 100 items to Supplier A",
-      "Added 50 items of Product X",
-      "Task 'Check Inventory Levels' completed",
-      "Low stock alert for Product Y",
-    ];
-
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -331,19 +372,29 @@ class _DashboardOverviewScreenState extends State<DashboardOverviewScreen> {
               ),
             ),
             const SizedBox(height: 10),
-            ListView.builder(
+            recentActivities.isEmpty
+                ? const Text(
+              "No recent activities available.",
+              style: TextStyle(color: Colors.white70),
+            )
+                : ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: activities.length,
+              itemCount: recentActivities.length,
               itemBuilder: (context, index) {
+                final activity = recentActivities[index];
                 return ListTile(
                   contentPadding: EdgeInsets.zero,
                   title: Text(
-                    activities[index],
+                    activity['description'] ?? 'No Description',
                     style: const TextStyle(
                       color: Colors.white70,
                       fontSize: 14,
                     ),
+                  ),
+                  subtitle: Text(
+                    activity['timestamp']?.toDate().toString() ?? 'Unknown Date',
+                    style: const TextStyle(color: Colors.white38),
                   ),
                   leading: const Icon(Icons.check_circle, color: Colors.green),
                 );
@@ -354,4 +405,32 @@ class _DashboardOverviewScreenState extends State<DashboardOverviewScreen> {
       ),
     );
   }
+
+  // Button for Apriori Insights
+  // Button for Apriori Insights
+  Widget _buildAprioriInsightsButton() {
+    return Center(
+      child: ElevatedButton(
+        onPressed: () {
+          // Navigate to Apriori Insights page
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const AprioriInsightsPage(),
+            ),
+          );
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFFB66A39),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+        child: const Text(
+          "View Apriori Insights",
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+    );
+  }
+
 }

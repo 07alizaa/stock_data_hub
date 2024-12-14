@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AlertsNotifications extends StatefulWidget {
   const AlertsNotifications({super.key});
@@ -8,27 +9,8 @@ class AlertsNotifications extends StatefulWidget {
 }
 
 class _AlertsNotificationsState extends State<AlertsNotifications> {
-  // List to hold notifications
-  List<Map<String, dynamic>> notifications = [
-    {"title": "Low stock alert", "detail": "Item A is running low.", "read": false},
-    {"title": "New order received", "detail": "Supplier B has sent a new order.", "read": false},
-    {"title": "Inventory updated", "detail": "Stock levels were updated.", "read": true},
-    {"title": "Task deadline", "detail": "Task #45 is nearing its deadline.", "read": false},
-  ];
-
-  // Function to clear all notifications
-  void clearNotifications() {
-    setState(() {
-      notifications.clear();
-    });
-  }
-
-  // Function to mark a notification as read
-  void markAsRead(int index) {
-    setState(() {
-      notifications[index]['read'] = true;
-    });
-  }
+  // Firestore instance
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -37,81 +19,146 @@ class _AlertsNotificationsState extends State<AlertsNotifications> {
         title: const Text('Alerts & Notifications'),
         backgroundColor: const Color(0xFF123D59), // Dark teal color
       ),
-      body: Container(
-        padding: const EdgeInsets.all(16.0),
-        color: const Color(0xFFF5F0E1), // Nude color background
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(
-              child: notifications.isEmpty
-                  ? Center(
-                child: Text(
-                  "No alerts or notifications",
-                  style: TextStyle(
-                    color: Colors.blue.shade700,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: _firestore
+            .collection('notifications')
+            .orderBy('timestamp', descending: true)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          if (snapshot.hasError) {
+            return const Center(
+              child: Text("Error fetching notifications"),
+            );
+          }
+
+          final notifications = snapshot.data?.docs ?? [];
+
+          if (notifications.isEmpty) {
+            return Center(
+              child: Text(
+                "No alerts or notifications",
+                style: TextStyle(
+                  color: Colors.blue.shade700,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
-              )
-                  : ListView.builder(
-                itemCount: notifications.length,
-                itemBuilder: (context, index) {
-                  final notification = notifications[index];
-                  return Card(
-                    color: notification['read']
-                        ? Colors.blue.shade100
-                        : const Color(0xFF123D59), // Dark teal for unread notifications
-                    margin: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: ListTile(
-                      leading: Icon(
-                        Icons.notifications,
-                        color: notification['read']
-                            ? Colors.blue.shade300
-                            : Colors.white,
-                      ),
-                      title: Text(
-                        notification['title'],
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
+              ),
+            );
+          }
+
+          return Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  itemCount: notifications.length,
+                  itemBuilder: (context, index) {
+                    final notification =
+                    notifications[index].data() as Map<String, dynamic>;
+                    final isRead = notification['read'] ?? false;
+
+                    return Card(
+                      color: isRead
+                          ? Colors.blue.shade100
+                          : const Color(0xFF123D59), // Dark teal for unread notifications
+                      margin: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: ListTile(
+                        leading: Icon(
+                          Icons.notifications,
+                          color: isRead
+                              ? Colors.blue.shade300
+                              : Colors.white,
+                        ),
+                        title: Text(
+                          notification['title'] ?? 'No Title',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        subtitle: Text(
+                          notification['detail'] ?? 'No Details Available',
+                          style: const TextStyle(color: Colors.white70),
+                        ),
+                        trailing: isRead
+                            ? null
+                            : IconButton(
+                          icon: const Icon(Icons.check_circle),
                           color: Colors.white,
+                          onPressed: () {
+                            _markAsRead(notifications[index].id);
+                          },
                         ),
                       ),
-                      subtitle: Text(
-                        notification['detail'],
-                        style: const TextStyle(color: Colors.white70),
-                      ),
-                      trailing: notification['read']
-                          ? null
-                          : IconButton(
-                        icon: const Icon(Icons.check_circle),
-                        color: Colors.white,
-                        onPressed: () => markAsRead(index),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: clearNotifications,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFECA25B),
-                padding: const EdgeInsets.symmetric(vertical: 12.0),
-              ),
-              child: const Text(
-                "Clear All Notifications",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
+                    );
+                  },
                 ),
               ),
-            ),
-          ],
-        ),
+              const SizedBox(height: 16.0),
+              ElevatedButton(
+                onPressed: _clearNotifications,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFECA25B),
+                  padding: const EdgeInsets.symmetric(vertical: 12.0),
+                ),
+                child: const Text(
+                  "Clear All Notifications",
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
+  }
+
+  /// Mark a notification as read
+  Future<void> _markAsRead(String notificationId) async {
+    try {
+      await _firestore
+          .collection('notifications')
+          .doc(notificationId)
+          .update({'read': true});
+
+      // Show a success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Notification marked as read')),
+      );
+    } catch (e) {
+      // Show an error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to mark as read: $e')),
+      );
+    }
+  }
+
+  /// Clear all notifications
+  Future<void> _clearNotifications() async {
+    try {
+      final snapshot = await _firestore.collection('notifications').get();
+
+      for (var doc in snapshot.docs) {
+        await _firestore.collection('notifications').doc(doc.id).delete();
+      }
+
+      // Show a success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('All notifications cleared')),
+      );
+    } catch (e) {
+      // Show an error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to clear notifications: $e')),
+      );
+    }
   }
 }

@@ -96,48 +96,70 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
+  /// Fetch history records from Firestore
   Future<List<Map<String, dynamic>>> _fetchHistory() async {
     final List<Map<String, dynamic>> history = [];
 
-    // Fetch dispatch records
-    final dispatchSnapshot = await _firestore
-        .collection('dispatchRecords')
-        .orderBy('date', descending: true)
-        .get();
-
-    for (var doc in dispatchSnapshot.docs) {
-      final data = doc.data();
-      history.add({
-        "action": "Dispatched",
-        "date": data["date"],
-        "details": "Product: ${data["product"]}, Quantity: ${data["quantity"]}, Supplier: ${data["supplier"]}",
-      });
-    }
-
-    // Fetch product changes history
-    final productsSnapshot = await _firestore.collection('products').get();
-    for (var productDoc in productsSnapshot.docs) {
-      final productId = productDoc.id;
-      final historySnapshot = await _firestore
-          .collection('products')
-          .doc(productId)
-          .collection('history')
-          .orderBy('timestamp', descending: true)
+    try {
+      // Fetch dispatch records
+      final dispatchSnapshot = await _firestore
+          .collection('dispatchRecords')
+          .orderBy('date', descending: true)
           .get();
 
-      for (var historyDoc in historySnapshot.docs) {
-        final data = historyDoc.data();
+      for (var doc in dispatchSnapshot.docs) {
+        final data = doc.data();
+        final dateField = data["date"];
+
+        // Add dispatch record to history
         history.add({
-          "action": data["action"],
-          "date": (data["timestamp"] as Timestamp).toDate().toString(),
-          "details": "Field: ${data["details"]["field"]}, Previous: ${data["details"]["previousValue"]}, New: ${data["details"]["newValue"]}",
+          "action": "Dispatched",
+          "date": dateField is Timestamp
+              ? dateField.toDate().toString()
+              : dateField, // Handle both string and Timestamp
+          "details":
+          "Product: ${data["product"]}, Quantity: ${data["quantity"]}, Supplier: ${data["supplier"]}",
         });
       }
+
+      // Fetch product history records
+      final productsSnapshot = await _firestore.collection('products').get();
+      for (var productDoc in productsSnapshot.docs) {
+        final productId = productDoc.id;
+        final historySnapshot = await _firestore
+            .collection('products')
+            .doc(productId)
+            .collection('history')
+            .orderBy('timestamp', descending: true)
+            .get();
+
+        for (var historyDoc in historySnapshot.docs) {
+          final data = historyDoc.data();
+          final timestampField = data["timestamp"];
+
+          // Add product history record to history
+          history.add({
+            "action": data["action"],
+            "date": timestampField is Timestamp
+                ? timestampField.toDate().toString()
+                : timestampField.toString(),
+            "details":
+            "Field: ${data["details"]["field"]}, Previous: ${data["details"]["previousValue"]}, New: ${data["details"]["newValue"]}",
+          });
+        }
+      }
+
+      // Sort all records by date (newest first)
+      history.sort((a, b) {
+        final dateA = DateTime.parse(a["date"]);
+        final dateB = DateTime.parse(b["date"]);
+        return dateB.compareTo(dateA);
+      });
+
+      return history;
+    } catch (e) {
+      print("Error fetching history: $e");
+      return [];
     }
-
-    // Sort by date
-    history.sort((a, b) => b["date"].compareTo(a["date"]));
-
-    return history;
   }
 }

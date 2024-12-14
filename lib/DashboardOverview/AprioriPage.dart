@@ -19,6 +19,7 @@ class _AprioriInsightsPageState extends State<AprioriInsightsPage> {
     _generateAprioriInsights();
   }
 
+  /// Generate Apriori insights
   Future<void> _generateAprioriInsights() async {
     List<List<String>> transactions = await firestoreService.fetchDispatchRecords();
 
@@ -27,6 +28,7 @@ class _AprioriInsightsPageState extends State<AprioriInsightsPage> {
       return;
     }
 
+    // Run Apriori Algorithm
     Apriori apriori = Apriori(0.3, 0.7); // Support: 30%, Confidence: 70%
     Map<Set<String>, double> frequentItemsets = apriori.generateFrequentItemsets(transactions);
     List<Map<String, dynamic>> rules = apriori.generateAssociationRules(frequentItemsets, transactions);

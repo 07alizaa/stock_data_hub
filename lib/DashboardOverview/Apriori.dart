@@ -4,16 +4,19 @@ class Apriori {
 
   Apriori(this.minSupport, this.minConfidence);
 
+  /// Generate frequent itemsets from transactions
   Map<Set<String>, double> generateFrequentItemsets(List<List<String>> transactions) {
     Map<Set<String>, int> itemsetCounts = {};
     int transactionCount = transactions.length;
 
+    // Count each item in transactions
     for (var transaction in transactions) {
       for (var item in transaction) {
         itemsetCounts.update({item}, (count) => count + 1, ifAbsent: () => 1);
       }
     }
 
+    // Filter itemsets by minimum support
     Map<Set<String>, double> frequentItemsets = {};
     itemsetCounts.forEach((itemset, count) {
       double support = count / transactionCount;
@@ -25,6 +28,7 @@ class Apriori {
     return frequentItemsets;
   }
 
+  /// Generate association rules from frequent itemsets
   List<Map<String, dynamic>> generateAssociationRules(
       Map<Set<String>, double> frequentItemsets, List<List<String>> transactions) {
     List<Map<String, dynamic>> rules = [];
@@ -51,6 +55,7 @@ class Apriori {
     return rules;
   }
 
+  /// Generate all non-empty subsets of a set
   List<Set<String>> _getSubsets(Set<String> set) {
     List<Set<String>> subsets = [];
     int n = set.length;
@@ -69,6 +74,7 @@ class Apriori {
     return subsets;
   }
 
+  /// Calculate confidence for an association rule
   double _calculateConfidence(Set<String> antecedent, Set<String> consequent, List<List<String>> transactions) {
     int antecedentCount = 0;
     int bothCount = 0;
