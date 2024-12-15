@@ -22,7 +22,7 @@ dependencies:
   shared_preferences:
   firebase_database:
   firebase_auth:
-  flutter_local_notifications:
+  flutter_local_notifications: ^18.0.1
   provider:
   intl:
 

@@ -285,25 +285,44 @@ class _LoginPageState extends State<LoginPage> {
       // Close the loading indicator
       Navigator.of(context).pop();
 
-      // Navigate to the appropriate dashboard
       if (userDoc.exists) {
         String? role = userDoc['role'];
 
-        if (role == 'Admin') {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const DashboardPage()),
-                (route) => false,
-          );
-        } else if (role == 'WareHouse') {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => MainDashboard()),
-                (route) => false,
-          );
-        } else {
-          _showErrorSnackbar('Role not recognized. Please contact support.');
-        }
+        // Show success dialog
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text("Login Successful"),
+              content: const Text("You have successfully logged in!"),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close dialog
+
+                    // Navigate to the appropriate dashboard
+                    if (role == 'Admin') {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (context) => const DashboardPage()),
+                            (route) => false,
+                      );
+                    } else if (role == 'WareHouse') {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (context) => MainDashboard()),
+                            (route) => false,
+                      );
+                    } else {
+                      _showErrorSnackbar('Role not recognized. Please contact support.');
+                    }
+                  },
+                  child: const Text("OK"),
+                ),
+              ],
+            );
+          },
+        );
       } else {
         _showErrorSnackbar('User data not found. Please contact support.');
       }
@@ -334,5 +353,5 @@ class _LoginPageState extends State<LoginPage> {
   /// Utility function to show error messages
   void _showErrorSnackbar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
-  }
+    }
 }

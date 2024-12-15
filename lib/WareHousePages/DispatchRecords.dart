@@ -377,6 +377,7 @@ class _DispatchFormScreenState extends State<DispatchFormScreen>
           context,
           MaterialPageRoute(
             builder: (context) => DispatchTrackingPage(dispatchId: dispatchRef.id),
+
           ),
         );
       } catch (e) {
